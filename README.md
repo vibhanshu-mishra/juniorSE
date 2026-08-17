@@ -1,20 +1,24 @@
-# juniorSE v0.1
+# juniorSE v0.2
 
 juniorSE is an open-source structural engineering skill library for AI-assisted design reasoning, bounded calculations, assumption control, and QA/QC under licensed engineer supervision.
 
+Repository: https://github.com/vibhanshu-mishra/juniorSE/tree/main
+
 The goal is not to replace engineering judgment. The goal is to make AI behave like a careful junior structural engineer: classify the task, identify the code path, ask for missing inputs, avoid silent assumptions, perform bounded calculations only when allowed, self-review, and hand off a reviewable result.
 
-## Initial skills
+## v0.2 contents
 
-1. `structural-response-protocol`
-2. `assumption-guardrails`
-3. `select-load-combinations`
-4. `calculation-qaqc-review`
-5. `steel-beam-gravity-check`
+This release contains the first five skills with a stronger machine-checkable structure.
+
+| Skill | Type | Status |
+|---|---:|---|
+| `structural-response-protocol` | framework / validated behavior | has `SKILL.md`, `rules.yaml`, `validator.py`, examples, tests |
+| `assumption-guardrails` | framework / validated behavior | has `SKILL.md`, `rules.yaml`, `validator.py`, examples, tests |
+| `select-load-combinations` | validated skill | has `SKILL.md`, `rules.yaml`, `validator.py`, examples, tests |
+| `calculation-qaqc-review` | framework / validated behavior | has `SKILL.md`, `rules.yaml`, `validator.py`, examples, tests |
+| `steel-beam-gravity-check` | executable starter skill | has `SKILL.md`, `rules.yaml`, `validator.py`, `calculator.py`, examples, tests |
 
 ## Skill maturity levels
-
-juniorSE uses three skill levels.
 
 ### Level 1 — Framework skills
 
@@ -25,6 +29,7 @@ Expected files:
 - `SKILL.md`
 - examples or usage notes when helpful
 - tests when behavior can be checked automatically
+- `rules.yaml` and `validator.py` when the framework behavior can be made machine-checkable
 
 ### Level 2 — Validated skills
 
@@ -51,12 +56,20 @@ Required files:
 - `examples/`
 - `tests/`
 
-## Current implementation status
+## Current execution boundary
 
-- `select-load-combinations` is a **validated skill**.
-- `steel-beam-gravity-check` is an **executable skill starter**. Its calculator currently covers basic simple-span demand/reaction/deflection mechanics and enforces input completeness. Full AISC capacity checks require section-property and code-equation modules in later versions.
-- Core skills remain Markdown-first framework skills.
+The `steel-beam-gravity-check` calculator is intentionally limited to simple-span uniform-load mechanics: reactions, maximum shear, maximum moment, and optional elastic deflection. It does **not** yet perform AISC section capacity, compactness, LTB, shear capacity, bearing, web local yielding/crippling, or final adequacy checks.
+
+That limitation is intentional. juniorSE should under-claim rather than over-claim.
 
 ## Safety and liability
 
-These skills are for preliminary and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
+These skills are for educational, preliminary, and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
+
+## Running tests
+
+From the repository root:
+
+```bash
+python -m pytest
+```

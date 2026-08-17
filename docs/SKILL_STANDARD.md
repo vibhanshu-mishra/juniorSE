@@ -21,23 +21,19 @@ A skill should make AI behave like a cautious junior structural engineer working
 13. Definition of done
 14. Handoffs
 
-## Skill maturity levels
+## Required structure by maturity level
 
 ### Level 1 — Framework skills
 
-Framework skills define global behavior. They may be Markdown-only if their role is conceptual or procedural.
-
-Examples:
-
-- `structural-response-protocol`
-- `assumption-guardrails`
-- `calculation-qaqc-review`
+Framework skills define global behavior. They may be conceptual, but whenever behavior can be checked automatically, they should include rules and tests.
 
 Expected files:
 
 - `SKILL.md`
-- examples or usage notes when useful
-- tests when the behavior can be validated automatically
+- `rules.yaml` when the behavior can be expressed as enforceable rules
+- `validator.py` when outputs or inputs can be checked
+- `examples/` when the behavior benefits from passing/blocked examples
+- `tests/` when the behavior can be validated automatically
 
 ### Level 2 — Validated skills
 
@@ -64,7 +60,7 @@ Required files:
 - `examples/`
 - `tests/`
 
-Additional expectation:
+Additional expectations:
 
 - benchmark examples with known expected outputs
 - tests for numerical results within a stated tolerance
