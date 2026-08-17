@@ -8,5 +8,5 @@ def test_f3_noncompact_flange():
  x=b();x.update({"flange_classification":"noncompact","flange_lambda":15});r=c.calculate(x);assert r["chapter_f_route"]=="F3";assert "compression_flange_local_buckling" in r["limit_state_nominal_strengths_kip_ft"]
 def test_f3_slender_flange():
  x=b();x.update({"flange_classification":"slender","flange_lambda":30});r=c.calculate(x);assert r["chapter_f_route"]=="F3";assert r["nominal_strength_Mn_kip_ft"]<50*90/12
-def test_noncompact_web_blocks_for_f4():
- x=b();x["web_classification"]="noncompact";r=c.calculate(x);assert r["status"]=="blocked_chapter_f_route";assert r["required_route"]=="F4"
+def test_noncompact_web_requires_f4_inputs_when_not_provided():
+ x=b();x["web_classification"]="noncompact";r=c.calculate(x);assert r["status"]=="blocked";assert "bf_in" in r["validation"]["missing_inputs"]

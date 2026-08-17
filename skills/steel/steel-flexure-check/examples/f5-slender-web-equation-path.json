@@ -1,0 +1,31 @@
+{
+  "source": "AISC 360-16 Section F5 equation-path example (synthetic regression case; not an AISC Companion example)",
+  "purpose": "Exercise Rpg, F5 LTB, and slender-web routing without claiming an official Companion benchmark",
+  "inputs": {
+    "design_method": "LRFD",
+    "section_symmetry": "doubly_symmetric",
+    "E_ksi": 29000,
+    "Fy_ksi": 50,
+    "Sx_in3": 500,
+    "Sxt_in3": 500,
+    "Zx_in3": 560,
+    "J_in4": 20,
+    "ho_in": 40,
+    "Lb_ft": 8,
+    "Cb": 1.0,
+    "bf_in": 12,
+    "tf_in": 1.0,
+    "h_in": 50,
+    "hc_in": 50,
+    "tw_in": 0.30,
+    "flange_classification": "compact",
+    "web_classification": "slender",
+    "flange_lambda": 6.0,
+    "flange_lambda_p": 9.15,
+    "flange_lambda_r": 24.1,
+    "web_lambda": 166.6667,
+    "web_lambda_p": 90.6,
+    "web_lambda_r": 137.0,
+    "required_moment_kip_ft": 1000
+  }
+}

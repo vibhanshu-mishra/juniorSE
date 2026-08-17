@@ -34,9 +34,9 @@ def calculate(inputs: Dict[str, Any]) -> Dict[str, Any]:
     if wc == "compact":
         route = "F2" if fc == "compact" else "F3"
     elif wc == "noncompact":
-        route = "F4_required_not_implemented_in_this_skill"
+        route = "F4"
     else:
-        route = "F5_required_not_implemented_in_this_skill"
+        route = "F5"
     return {
         "status": "complete",
         "basis": "AISC 360-16 Chapter B flexural element classification for doubly symmetric I/W shapes.",

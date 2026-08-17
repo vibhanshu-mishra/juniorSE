@@ -1,0 +1,37 @@
+{
+  "source": "AISC 15th Edition Manual Companion v15.1, Volume 1, Example F.15",
+  "purpose": "F4 regression benchmark for a doubly symmetric built-up plate girder with a noncompact web",
+  "inputs": {
+    "design_method": "LRFD",
+    "section_symmetry": "doubly_symmetric",
+    "E_ksi": 29000,
+    "Fy_ksi": 50,
+    "Sx_in3": 2040,
+    "Sxt_in3": 2040,
+    "Zx_in3": 2270,
+    "J_in4": 77.3,
+    "ho_in": 64.0,
+    "Lb_ft": 12.5,
+    "Cb": 1.25,
+    "bf_in": 14.0,
+    "tf_in": 2.0,
+    "h_in": 62.0,
+    "hc_in": 62.0,
+    "tw_in": 0.5,
+    "flange_classification": "compact",
+    "web_classification": "noncompact",
+    "flange_lambda": 3.5,
+    "flange_lambda_p": 9.15,
+    "flange_lambda_r": 24.1,
+    "web_lambda": 124.0,
+    "web_lambda_p": 90.6,
+    "web_lambda_r": 137.0,
+    "required_moment_kip_ft": 6910.0
+  },
+  "benchmark": {
+    "Rpc_approx": 1.03,
+    "Lp_in_approx": 98.3,
+    "Lr_in_approx": 369.0,
+    "Mn_kip_ft_approx": 8760.0
+  }
+}

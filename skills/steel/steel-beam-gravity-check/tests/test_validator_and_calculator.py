@@ -9,7 +9,7 @@ def test_serviceability_limits():
  r=c.calculate(BASE)["serviceability"];assert r["live_load_limit_in"]==1.0;assert round(r["dead_plus_live_limit_in"],6)==round(240/360,6)
 def test_noncompact_flange_is_not_blocked():
  x=dict(BASE);x.update({"bf_in":14,"tf_in":0.4});r=c.calculate(x);assert r["strength_checks"]["chapter_f_flexure"]["chapter_f_route"]=="F3"
-def test_noncompact_web_blocks_f4_route():
- x=dict(BASE);x.update({"h_in":100,"tw_in":0.4});r=c.calculate(x);assert r["status"]=="blocked_chapter_f_route";assert r["strength_checks"]["chapter_f_flexure"]["required_route"] in {"F4","F5"}
+def test_slender_web_routes_to_f5():
+ x=dict(BASE);x.update({"h_in":100,"tw_in":0.4});r=c.calculate(x);assert r["strength_checks"]["chapter_f_flexure"]["chapter_f_route"]=="F5";assert r["strength_checks"]["chapter_f_flexure"]["status"]=="complete"
 def test_optional_web_local_checks_run():
  x=dict(BASE);x.update({"concentrated_force_kips":40,"bearing_length_N_in":4,"distance_from_end_in":30,"k_in":1.0});r=c.calculate(x);assert r["strength_checks"]["chapter_j10_web_local"]["status"]=="complete"

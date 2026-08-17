@@ -1,6 +1,44 @@
 skill_id: steel-flexure-check
 level: executable
-code_basis: {primary: AISC 360-16, chapter: F}
-implemented_routes: [F2, F3]
-blocked_routes: [F4, F5]
-required_inputs: [design_method, E_ksi, Fy_ksi, Sx_in3, Zx_in3, ry_in, rts_in, J_in4, ho_in, Lb_ft, Cb, flange_classification, web_classification, flange_lambda, flange_lambda_p, flange_lambda_r, h_in, tw_in, required_moment_kip_ft]
+code_basis:
+  primary: AISC 360-16
+  chapter: F
+implemented_routes:
+  - F2: doubly symmetric compact-web, compact-flange I-shapes
+  - F3: doubly symmetric compact-web I-shapes with noncompact/slender flanges
+  - F4: doubly symmetric I-shapes with noncompact webs
+  - F5: doubly symmetric I-shapes with slender webs
+phase_1b_boundaries:
+  - singly symmetric F4/F5 members remain blocked
+  - simple bending about the major principal axis only
+  - no torsion or biaxial bending
+  - engineer review required
+required_core_inputs:
+  - design_method
+  - E_ksi
+  - Fy_ksi
+  - Sx_in3
+  - Zx_in3
+  - J_in4
+  - ho_in
+  - Lb_ft
+  - Cb
+  - flange_classification
+  - web_classification
+  - flange_lambda
+  - flange_lambda_p
+  - flange_lambda_r
+  - h_in
+  - tw_in
+  - required_moment_kip_ft
+f4_f5_additional_inputs:
+  - bf_in
+  - tf_in
+  - web_lambda
+  - web_lambda_p
+  - web_lambda_r
+benchmark:
+  source: AISC 15th Edition Manual Companion v15.1, Volume 1
+  example: F.15 Plate Girder Flexural Member
+  f4_expected_nominal_strength_kip_ft: 8760
+  note: Companion v15.1 includes an F4 plate-girder example; no dedicated F5 slender-web example was identified in Chapter F examples, so F5 tests verify the AISC 360-16 equation paths directly.
