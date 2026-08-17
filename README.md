@@ -59,4 +59,4 @@ Required files:
 
 ## Safety and liability
 
-These skills are for educational, preliminary, and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
+These skills are for preliminary and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
