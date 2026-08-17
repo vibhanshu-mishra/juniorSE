@@ -22,24 +22,31 @@ Executable skills additionally include `calculator.py`.
 - `steel-web-local-checks`
 - `steel-beam-gravity-check` (orchestrator)
 
-### AISC 360-16 scope in v0.6
+### AISC 360-16 scope in v0.7
 - Chapter B flexural element classification for doubly symmetric I/W shapes.
 - Chapter F2 compact-web/compact-flange major-axis flexure.
 - Chapter F3 compact-web/noncompact-or-slender-flange major-axis flexure.
+- Chapter F4 doubly symmetric I-shaped members with noncompact webs.
+- Chapter F5 doubly symmetric I-shaped members with slender webs.
 - Chapter G unstiffened-web shear with calculated `Cv1`.
 - Chapter J10.2 web local yielding.
 - Chapter J10.3 web local crippling.
 - Live-load deflection limit: `L/240`.
 - Dead + live deflection limit: `L/360`.
 
-### Intentionally blocked in v0.6
-- Chapter F4 noncompact-web flexure.
-- Chapter F5 slender-web flexure.
+### Phase 1B benchmark policy
+- F4 is regression-tested against AISC 15th Edition Manual Companion v15.1, Volume 1, Example F.15 (Plate Girder Flexural Member).
+- The Companion is keyed to ANSI/AISC 360-16.
+- No dedicated F5 slender-web Chapter F example was identified in the v15.1 Companion chapter examples. F5 is therefore tested equation-by-equation against the AISC 360-16 F5 framework and is not mislabeled as Companion-benchmarked.
+
+### Intentionally blocked / future phases
+- Singly symmetric F4/F5 member implementation.
 - Continuous beam analysis.
-- Point-load analysis.
+- Point-load analysis in the gravity-analysis engine.
 - Composite beams.
 - Torsion and biaxial bending.
-- Connection, bearing-plate, stiffener, web sidesway buckling, and web compression buckling design.
+- Full axial tension/compression capacity and Chapter H beam-column interaction.
+- Connection and bearing-plate design.
 
 The library must block unsupported paths rather than silently substitute a simpler equation.
 
