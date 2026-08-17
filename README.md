@@ -22,7 +22,7 @@ Executable skills additionally include `calculator.py`.
 - `steel-web-local-checks`
 - `steel-beam-gravity-check` (orchestrator)
 
-### AISC 360-16 scope in v0.8
+### AISC 360-16 scope through v0.9
 - Chapter B flexural element classification for doubly symmetric I/W shapes.
 - Chapter F2 compact-web/compact-flange major-axis flexure.
 - Chapter F3 compact-web/noncompact-or-slender-flange major-axis flexure.
@@ -41,24 +41,28 @@ Executable skills additionally include `calculator.py`.
 
 
 ### Phase 2 beam-analysis scope
-`steel-beam-gravity-analysis` now supports direct linear-elastic analysis for:
-- simple beams
-- cantilevers
-- fixed-fixed and propped cantilevers
-- multi-span continuous beams with explicit pinned/roller/fixed supports
+`steel-beam-gravity-analysis` now supports a direct finite-element demand engine for:
+- simple, cantilever, fixed, propped, and multi-span continuous beams
 - full-span and partial uniform loads
-- concentrated point loads
-- mixed point + uniform loading
-- reactions, positive/negative moments, shear, and deflection
+- concentrated point loads and applied concentrated moments
+- triangular and trapezoidal line loads
+- mixed loading
+- piecewise-variable EI
+- imposed vertical support settlements
+- moving axle-pattern envelopes
+- optional Timoshenko shear deformation with explicit `G` and effective `Av`
+- bounded elastic geometric-stiffness second-order analysis with explicit axial force
+- a separate Saint-Venant torsion channel with point/distributed torque and piecewise `GJ`
+- unified reaction/shear/moment/deflection/torsion demand envelopes
 
-The implementation uses a direct Euler-Bernoulli stiffness solution instead of copying Manual lookup tables. It aligns behaviorally with the beam-analysis families identified by AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23. Concentrated loads are kept at their actual locations rather than being replaced with equivalent uniform loads unless an engineer explicitly requests that approximation.
+The implementation analyzes the actual system directly rather than copying Manual lookup tables. AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23 remain reference/benchmark families.
 
-Current Phase 2 limits include constant EI, no applied concentrated moments, no linearly varying/trapezoidal distributed loads, no support settlement, no moving-load envelope, and no second-order effects.
+Second-order mode is deliberately labeled as an elastic geometric-stiffness analysis aid, **not** a complete AISC 360-16 Direct Analysis Method implementation. Torsion is Saint-Venant only; restrained warping remains outside Phase 2B.
 
 ### Intentionally blocked / future phases
 - Singly symmetric F4/F5 member implementation.
 - Composite beams.
-- Torsion and biaxial bending.
+- Restrained warping torsion and biaxial bending strength interaction.
 - Full axial tension/compression capacity and Chapter H beam-column interaction.
 - Connection and bearing-plate design.
 
@@ -66,3 +70,7 @@ The library must block unsupported paths rather than silently substitute a simpl
 
 ## Engineering responsibility
 juniorSE is intended for engineer-supervised workflows. Results require review by a qualified structural engineer and are not a substitute for project-specific code interpretation, engineering judgment, or professional responsibility.
+
+## v1.0 — Phase 2 demand-to-strength integration
+
+The generalized `steel-beam-gravity-analysis` demand envelope now feeds the existing AISC 360-16 strength modules. `steel-beam-gravity-check` preserves positive and negative moment separately for Chapter F, sends governing shear to Chapter G, resolves explicitly requested support-reaction/local-force cases to J10.2/J10.3, and reports torsional demand separately rather than treating F/G/J10 as a torsional design check. The older simple-span UDL interface remains compatibility-only.
