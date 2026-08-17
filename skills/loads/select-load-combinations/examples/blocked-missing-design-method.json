@@ -1,9 +1,13 @@
 {
-  "code_family": "ASCE 7",
-  "code_edition": "ASCE 7-22",
-  "load_cases": [
-    "D",
-    "L"
-  ],
-  "load_level": "service"
+  "input": {
+    "code_family": "ASCE 7",
+    "code_edition": "ASCE 7-22",
+    "load_level": "service",
+    "loads": {"D": 1.0, "L": 2.0},
+    "objective": "strength"
+  },
+  "expected_behavior": {
+    "status": "blocked",
+    "missing_inputs": ["design_method"]
+  }
 }

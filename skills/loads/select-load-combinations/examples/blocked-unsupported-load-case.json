@@ -4,13 +4,11 @@
     "code_edition": "ASCE 7-22",
     "design_method": "LRFD",
     "load_level": "service",
-    "loads": {"D": 1.0, "L": 2.0},
+    "loads": {"D": 1.0, "H": 0.4},
     "objective": "strength"
   },
   "expected_behavior": {
-    "status": "complete_preliminary",
-    "governing_positive_name": "LRFD-2",
-    "governing_positive_value": 4.4,
-    "engineer_review_required": true
+    "status": "blocked",
+    "unsupported_load_cases": ["H"]
   }
 }

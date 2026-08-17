@@ -92,3 +92,8 @@ A completed engineering response should include:
 9. Governing result
 10. QA/QC review
 11. Engineer review notes
+
+
+## Executable upgrade rule
+
+When a validated skill begins returning numerical results or governing values, it must be upgraded to an executable skill. Executable skills must include `calculator.py` in addition to `SKILL.md`, `rules.yaml`, `validator.py`, `examples/`, and `tests/`. The calculator scope must be written into `rules.yaml` and the `SKILL.md`, including both implemented and explicitly not-implemented behavior.

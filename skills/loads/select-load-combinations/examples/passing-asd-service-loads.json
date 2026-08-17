@@ -2,15 +2,15 @@
   "input": {
     "code_family": "ASCE 7",
     "code_edition": "ASCE 7-22",
-    "design_method": "LRFD",
+    "design_method": "ASD",
     "load_level": "service",
     "loads": {"D": 1.0, "L": 2.0},
-    "objective": "strength"
+    "objective": "allowable_stress"
   },
   "expected_behavior": {
     "status": "complete_preliminary",
-    "governing_positive_name": "LRFD-2",
-    "governing_positive_value": 4.4,
+    "governing_positive_name": "ASD-2",
+    "governing_positive_value": 3.0,
     "engineer_review_required": true
   }
 }
