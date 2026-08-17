@@ -4,8 +4,6 @@ juniorSE is an open-source structural engineering skill library for AI-assisted 
 
 The goal is not to replace engineering judgment. The goal is to make AI behave like a careful junior structural engineer: classify the task, identify the code path, ask for missing inputs, avoid silent assumptions, perform bounded calculations only when allowed, self-review, and hand off a reviewable result.
 
-Repository: https://github.com/vibhanshu-mishra/juniorSE/tree/main
-
 ## Initial skills
 
 1. `structural-response-protocol`
