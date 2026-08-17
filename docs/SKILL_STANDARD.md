@@ -1,8 +1,10 @@
-# Structural Skill Standard
+# juniorSE Structural Skill Standard
 
-Every structural skill must be written as an executable method, not as generic notes.
+Every juniorSE skill must be written as a reusable engineering method, not generic notes.
 
-## Required sections
+A skill should make AI behave like a cautious junior structural engineer working under supervision: classify the task, identify the code path, verify inputs, avoid silent assumptions, perform only bounded work, self-review, and hand off the result for engineer review.
+
+## Required sections in every `SKILL.md`
 
 1. Metadata frontmatter
 2. Purpose
@@ -19,6 +21,55 @@ Every structural skill must be written as an executable method, not as generic n
 13. Definition of done
 14. Handoffs
 
+## Skill maturity levels
+
+### Level 1 — Framework skills
+
+Framework skills define global behavior. They may be Markdown-only if their role is conceptual or procedural.
+
+Examples:
+
+- `structural-response-protocol`
+- `assumption-guardrails`
+- `calculation-qaqc-review`
+
+Expected files:
+
+- `SKILL.md`
+- examples or usage notes when useful
+- tests when the behavior can be validated automatically
+
+### Level 2 — Validated skills
+
+Validated skills are used when a wrong assumption, missing input, or wrong code path could produce unsafe or misleading output. They do not have to run full calculations, but they must be machine-checkable.
+
+Required files:
+
+- `SKILL.md` — human-readable engineering workflow
+- `rules.yaml` — machine-readable required inputs, stop conditions, guardrails, and definition of done
+- `validator.py` — Python validation for required inputs and stop conditions
+- `examples/` — at least one passing example and one blocked/missing-input example
+- `tests/` — automated tests proving the validator behaves correctly
+
+### Level 3 — Executable skills
+
+Executable skills validate first, then run bounded calculations.
+
+Required files:
+
+- `SKILL.md`
+- `rules.yaml`
+- `validator.py`
+- `calculator.py`
+- `examples/`
+- `tests/`
+
+Additional expectation:
+
+- benchmark examples with known expected outputs
+- tests for numerical results within a stated tolerance
+- explicit limits on what the calculator does not yet cover
+
 ## Global principles
 
 - No silent assumptions.
@@ -28,6 +79,7 @@ Every structural skill must be written as an executable method, not as generic n
 - No code-path claims without stating the governing basis.
 - No calculation output without a self-review.
 - Uncertainty must be shown, not hidden.
+- If a critical input materially affects safety, load path, demand, capacity, or serviceability, the skill must stop or label the output as preliminary with explicit assumptions.
 
 ## Standard output expectation
 
@@ -44,4 +96,3 @@ A completed engineering response should include:
 9. Governing result
 10. QA/QC review
 11. Engineer review notes
-

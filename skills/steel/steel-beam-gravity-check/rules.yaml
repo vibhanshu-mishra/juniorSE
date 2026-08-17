@@ -1,0 +1,47 @@
+skill_id: steel-beam-gravity-check
+level: executable
+purpose: Validate and perform bounded simple-span steel beam gravity demand calculations under engineer supervision.
+current_scope:
+  - simply_supported_uniform_gravity_load
+  - reactions
+  - maximum_moment
+  - maximum_shear
+  - optional_service_deflection_if_E_and_I_are_given
+out_of_scope_currently:
+  - AISC flexural capacity lookup
+  - AISC shear capacity lookup
+  - lateral-torsional buckling capacity calculation
+  - compactness classification
+  - continuous beams
+  - point loads
+  - connection design
+  - final stamped design
+required_inputs:
+  - code_family
+  - code_edition
+  - design_method
+  - span_ft
+  - dead_load_plf
+  - live_load_plf
+  - load_level
+  - support_condition
+  - bracing_condition
+  - steel_grade
+  - member_section
+stop_conditions:
+  - field: bracing_condition
+    message: Cannot complete a steel beam check without lateral bracing or unbraced length information.
+  - field: design_method
+    message: Cannot proceed without ASD or LRFD.
+  - field: load_level
+    message: Cannot proceed until loads are identified as service-level or factored.
+forbidden:
+  - Do not assume continuous bracing unless explicitly provided.
+  - Do not claim AISC strength adequacy unless section properties and applicable AISC checks are performed.
+  - Do not present analysis-only demand results as final design capacity checks.
+definition_of_done:
+  - Required inputs validated.
+  - Scope limitations stated.
+  - Reactions, maximum shear, and maximum moment calculated for current supported load pattern.
+  - Service deflection calculated only if E and Ix are provided.
+  - QA/QC and engineer review notes included.

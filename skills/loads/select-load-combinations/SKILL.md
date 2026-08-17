@@ -108,3 +108,13 @@ The skill is complete when:
 - Use `assumption-guardrails` before selecting combinations if inputs are incomplete.
 - Use material/member design skills after determining demand.
 - Use `calculation-qaqc-review` before final output if numerical demand is calculated.
+
+
+## Implementation files
+
+This juniorSE skill includes machine-checkable support files:
+
+- `rules.yaml` for required inputs, stop conditions, guardrails, and definition of done.
+- `validator.py` for input validation and stop-condition checks.
+- `examples/` for passing and blocked scenarios.
+- `tests/` for automated validation behavior.

@@ -1,0 +1,9 @@
+{
+  "code_family": "ASCE 7",
+  "code_edition": "ASCE 7-22",
+  "load_cases": [
+    "D",
+    "L"
+  ],
+  "load_level": "service"
+}

@@ -171,3 +171,14 @@ The skill is complete only when:
 - governing result is identified
 - QA/QC review is included
 - engineer-review items are listed
+
+
+## Implementation files
+
+This juniorSE skill includes machine-checkable support files:
+
+- `rules.yaml` for required inputs, stop conditions, guardrails, and definition of done.
+- `validator.py` for input validation and stop-condition checks.
+- `examples/` for passing and blocked scenarios.
+- `tests/` for automated validation behavior.
+- `calculator.py` for the current bounded executable starter calculation scope.

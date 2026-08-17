@@ -2,7 +2,7 @@
 
 Prompt to an AI agent:
 
-> Use the juniorSE Skills library. Check whether W12x26 works as a simply supported non-composite steel beam spanning 20 ft with 1.0 kip/ft dead load and 2.0 kip/ft live load. Use LRFD, AISC 360-22, A992 steel, and assume continuous lateral bracing. Use L/360 live-load deflection limit.
+> Use the juniorSE library. Check whether W12x26 works as a simply supported non-composite steel beam spanning 20 ft with 1.0 kip/ft dead load and 2.0 kip/ft live load. Use LRFD, AISC 360-22, A992 steel, and assume continuous lateral bracing. Use L/360 live-load deflection limit.
 
 Expected behavior:
 

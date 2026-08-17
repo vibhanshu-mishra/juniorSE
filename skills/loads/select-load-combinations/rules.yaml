@@ -1,0 +1,37 @@
+skill_id: select-load-combinations
+level: validated
+purpose: Select applicable structural load-combination path and prevent ASD/LRFD or service/factored load mixing.
+required_inputs:
+  - code_family
+  - code_edition
+  - design_method
+  - load_cases
+  - load_level
+allowed_design_methods:
+  - ASD
+  - LRFD
+allowed_load_levels:
+  - service
+  - factored
+stop_conditions:
+  - field: code_family
+    message: Cannot select load combinations without governing load code family, such as ASCE 7.
+  - field: code_edition
+    message: Cannot claim code-specific combinations without code edition.
+  - field: design_method
+    message: Cannot select demand/capacity format without ASD or LRFD.
+  - field: load_cases
+    message: Cannot select combinations without identified load cases.
+  - field: load_level
+    message: Cannot proceed until loads are identified as service-level or factored.
+forbidden:
+  - Do not mix ASD combinations with LRFD capacities.
+  - Do not mix LRFD combinations with ASD allowable capacities.
+  - Do not use already-factored loads in another factored combination unless explicitly directed and justified.
+definition_of_done:
+  - Inputs summarized.
+  - Design method stated.
+  - Load level stated.
+  - Applicable combination family stated.
+  - Missing or excluded load types disclosed.
+  - Engineer review note included.
