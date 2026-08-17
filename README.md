@@ -22,7 +22,7 @@ Executable skills additionally include `calculator.py`.
 - `steel-web-local-checks`
 - `steel-beam-gravity-check` (orchestrator)
 
-### AISC 360-16 scope in v0.7
+### AISC 360-16 scope in v0.8
 - Chapter B flexural element classification for doubly symmetric I/W shapes.
 - Chapter F2 compact-web/compact-flange major-axis flexure.
 - Chapter F3 compact-web/noncompact-or-slender-flange major-axis flexure.
@@ -39,10 +39,24 @@ Executable skills additionally include `calculator.py`.
 - The Companion is keyed to ANSI/AISC 360-16.
 - No dedicated F5 slender-web Chapter F example was identified in the v15.1 Companion chapter examples. F5 is therefore tested equation-by-equation against the AISC 360-16 F5 framework and is not mislabeled as Companion-benchmarked.
 
+
+### Phase 2 beam-analysis scope
+`steel-beam-gravity-analysis` now supports direct linear-elastic analysis for:
+- simple beams
+- cantilevers
+- fixed-fixed and propped cantilevers
+- multi-span continuous beams with explicit pinned/roller/fixed supports
+- full-span and partial uniform loads
+- concentrated point loads
+- mixed point + uniform loading
+- reactions, positive/negative moments, shear, and deflection
+
+The implementation uses a direct Euler-Bernoulli stiffness solution instead of copying Manual lookup tables. It aligns behaviorally with the beam-analysis families identified by AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23. Concentrated loads are kept at their actual locations rather than being replaced with equivalent uniform loads unless an engineer explicitly requests that approximation.
+
+Current Phase 2 limits include constant EI, no applied concentrated moments, no linearly varying/trapezoidal distributed loads, no support settlement, no moving-load envelope, and no second-order effects.
+
 ### Intentionally blocked / future phases
 - Singly symmetric F4/F5 member implementation.
-- Continuous beam analysis.
-- Point-load analysis in the gravity-analysis engine.
 - Composite beams.
 - Torsion and biaxial bending.
 - Full axial tension/compression capacity and Chapter H beam-column interaction.
