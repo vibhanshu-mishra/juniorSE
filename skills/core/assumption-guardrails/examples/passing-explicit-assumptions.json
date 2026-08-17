@@ -1,0 +1,21 @@
+{
+  "required_for_scope": [
+    "design_method",
+    "code_edition",
+    "bracing_condition"
+  ],
+  "assumptions": {
+    "design_method": {
+      "value": "LRFD",
+      "status": "user_provided"
+    },
+    "code_edition": {
+      "value": "AISC 360-22",
+      "status": "user_provided"
+    },
+    "bracing_condition": {
+      "value": "continuous compression flange bracing",
+      "status": "explicitly_assumed_preliminary"
+    }
+  }
+}

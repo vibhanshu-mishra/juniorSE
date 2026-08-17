@@ -1,0 +1,14 @@
+{
+  "code_family": "ASCE 7 / AISC",
+  "code_edition": "ASCE 7-22 / AISC 360-22",
+  "design_method": "LRFD",
+  "span_ft": 20,
+  "dead_load_plf": 1000,
+  "live_load_plf": 2000,
+  "load_level": "service",
+  "support_condition": "simply_supported",
+  "bracing_condition": "continuous top flange bracing stated by user",
+  "steel_grade": "A992 Fy=50 ksi",
+  "member_section": "W-shape with Ix not provided",
+  "composite_status": "non-composite"
+}
