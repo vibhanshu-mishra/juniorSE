@@ -1,0 +1,18 @@
+{
+  "description": "Two-segment EI beam with explicit support settlement.",
+  "inputs": {
+    "span_ft": 20,
+    "supports": [
+      {"x_ft": 0, "type": "pinned", "settlement_in": 0},
+      {"x_ft": 20, "type": "roller", "settlement_in": -0.25}
+    ],
+    "load_level": "service",
+    "stiffness_segments": [
+      {"x_start_ft": 0, "x_end_ft": 10, "E_ksi": 29000, "Ix_in4": 1000},
+      {"x_start_ft": 10, "x_end_ft": 20, "E_ksi": 29000, "Ix_in4": 700}
+    ],
+    "dead_load_plf": 500,
+    "live_load_plf": 0
+  },
+  "expected_behavior": "ready; compatibility includes prescribed settlement and piecewise stiffness"
+}

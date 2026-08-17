@@ -1,0 +1,12 @@
+{
+  "description": "Simple beam-column second-order request too close to Euler instability for bounded analysis.",
+  "inputs": {
+    "span_ft": 20,
+    "support_condition": "simple",
+    "load_level": "service",
+    "E_ksi": 29000,
+    "Ix_in4": 1000,
+    "second_order": {"enabled": true, "axial_force_lb": 5000000}
+  },
+  "expected_behavior": "blocked; rigorous stability analysis required"
+}

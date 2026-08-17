@@ -1,0 +1,13 @@
+{
+  "note": "Example fragment showing J10 routing after analysis_result is supplied.",
+  "web_local_cases": [
+    {
+      "name": "left support",
+      "source": "support_reaction",
+      "x_ft": 0.0,
+      "bearing_length_N_in": 6.0,
+      "distance_from_end_in": 0.0,
+      "k_in": 1.0
+    }
+  ]
+}

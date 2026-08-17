@@ -1,0 +1,18 @@
+{
+  "description": "Cantilever Saint-Venant torsion with explicit restraint and end torque.",
+  "inputs": {
+    "span_ft": 10,
+    "support_condition": "cantilever",
+    "load_level": "service",
+    "E_ksi": 29000,
+    "Ix_in4": 1000,
+    "torsion": {
+      "enabled": true,
+      "G_ksi": 11200,
+      "J_in4": 10,
+      "restraints": [0],
+      "point_torques": [{"T_lb_in": 12000, "x_ft": 10}]
+    }
+  },
+  "expected_behavior": "rotation follows TL/GJ; warping torsion is explicitly excluded"
+}

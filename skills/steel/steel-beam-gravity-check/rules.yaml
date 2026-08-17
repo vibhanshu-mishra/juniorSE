@@ -1,13 +1,12 @@
 skill_id: steel-beam-gravity-check
 level: executable
-purpose: Orchestrate bounded AISC 360-16 steel beam analysis, serviceability, section classification, flexure, shear, and optional concentrated-force web local checks.
+purpose: Orchestrate AISC 360-16 steel member strength and serviceability checks from a standardized generalized beam-analysis result.
 uses_skills:
   - steel-beam-gravity-analysis
   - steel-section-classification
   - steel-flexure-check
   - steel-shear-check
   - steel-web-local-checks
-  - select-load-combinations
   - assumption-guardrails
   - calculation-qaqc-review
 code_basis:
@@ -16,31 +15,39 @@ code_basis:
   flexure: Chapter F
   shear: Chapter G
   web_local_checks: Chapter J10.2 and J10.3
-current_scope:
-  - simply_supported_uniform_gravity_load
-  - noncomposite_doubly_symmetric_I_or_W_shape_major_axis_bending
-  - compact_web_with_compact_noncompact_or_slender_flange_flexure_routes_F2_F3
-  - unstiffened_web_shear_with_Cv1_calculation
-  - optional_web_local_yielding_and_crippling_for_concentrated_force_or_reaction
-  - serviceability_check
-blocked_currently:
-  - Chapter_F4_noncompact_web_flexure
-  - Chapter_F5_slender_web_flexure
-  - composite_beam_design
+preferred_interface:
+  analysis_result: completed output from steel-beam-gravity-analysis used for strength demands
+  service_analysis_result: optional completed service-level output used for deflection checks
+supported_demand_sources:
+  - uniform_loads
+  - point_loads
+  - triangular_and_trapezoidal_loads
+  - concentrated_moments
   - continuous_beams
-  - point_load_analysis
-  - torsion
-  - biaxial_bending
-  - connection_or_bearing_plate_design
-required_inputs:
+  - support_settlements
+  - variable_EI
+  - moving_load_envelopes
+  - bounded_second_order_analysis
+strength_routing:
+  positive_moment: Chapter F check, sign preserved
+  negative_moment: separate Chapter F check, sign preserved
+  governing_shear: Chapter G check
+  explicit_web_local_cases: Chapter J10.2 and J10.3
+web_local_sources:
+  - support_reaction
+  - explicit_force
+torsion_policy: Torsional demand is reported separately and is not treated as covered by Chapter F, G, or J10.
+serviceability_defaults:
+  live_load_limit: L/240
+  total_load_limit: L/360
+legacy_interface:
+  status: supported_for_backward_compatibility
+  scope: simple_span_uniform_load_only
+  recommendation: use analysis_result for all new work
+required_section_inputs:
   - code_family
   - code_edition
   - design_method
-  - span_ft
-  - dead_load_plf
-  - live_load_plf
-  - load_level
-  - support_condition
   - bracing_condition
   - steel_grade
   - member_section
@@ -61,11 +68,9 @@ required_inputs:
   - ho_in
   - Lb_ft
   - Cb
-serviceability_defaults:
-  live_load_limit: L/240
-  total_load_limit: L/360
-optional_web_local_inputs:
-  - concentrated_force_kips
-  - bearing_length_N_in
-  - distance_from_end_in
-  - k_in
+blocked_or_deferred:
+  - composite_beam_design
+  - torsional_strength_design
+  - biaxial_bending
+  - connection_design
+  - bearing_plate_design

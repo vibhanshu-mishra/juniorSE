@@ -1,0 +1,22 @@
+{
+  "description": "20-ft simple beam with triangular dead load, live point load, and a concentrated dead-load moment.",
+  "inputs": {
+    "span_ft": 20,
+    "support_condition": "simple",
+    "load_level": "service",
+    "E_ksi": 29000,
+    "Ix_in4": 1000,
+    "dead_load_plf": 0,
+    "live_load_plf": 0,
+    "linear_loads": [
+      {"w_start_plf": 0, "w_end_plf": 1200, "x_start_ft": 0, "x_end_ft": 20, "category": "dead"}
+    ],
+    "point_loads": [
+      {"P_lb": 5000, "x_ft": 10, "category": "live"}
+    ],
+    "concentrated_moments": [
+      {"M_lb_ft": 4000, "x_ft": 15, "category": "dead"}
+    ]
+  },
+  "expected_behavior": "ready; direct reactions/shear/moment/deflection; no equivalent-UDL substitution"
+}

@@ -1,13 +1,17 @@
 skill_id: steel-beam-gravity-analysis
 level: executable
-purpose: Perform linear-elastic beam analysis for common gravity-beam support and loading cases, including direct equivalents of the beam behaviors summarized in AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23.
+purpose: Perform engineer-supervised beam demand analysis for common and advanced gravity-beam effects before material-specific strength checks.
 analysis_basis:
-  method: Euler-Bernoulli beam stiffness method
+  primary_bending_method: finite_element_beam_stiffness
+  default_bending_theory: Euler-Bernoulli
+  optional_shear_deformation: Timoshenko with user-supplied effective shear area
+  optional_second_order: elastic geometric stiffness, bounded analysis aid only
+  optional_torsion: Saint-Venant torsion only
   assumptions:
-    - linear_elastic
-    - small_displacement
-    - prismatic_constant_EI_in_current_release
-    - loads_act_in_primary_bending_plane
+    - linear_elastic_material_behavior
+    - explicit_support_restraints
+    - loads_act_in_the_defined_primary_bending_plane
+    - no_silent_property_defaults
 supported_geometry:
   - single_span
   - multi_span_continuous
@@ -15,56 +19,66 @@ supported_supports:
   - pinned
   - roller
   - fixed
-  - simple_shorthand
-  - cantilever_shorthand
-  - fixed_fixed_shorthand
-  - propped_cantilever_shorthand
-supported_loads:
-  - full_span_uniform_dead_load
-  - full_span_uniform_live_load
-  - concentrated_point_loads
+  - imposed_vertical_support_settlement
+supported_bending_loads:
+  - full_span_uniform_loads
   - partial_uniform_loads
-  - mixed_point_and_uniform_loads
+  - concentrated_point_loads
+  - linearly_varying_triangular_loads
+  - linearly_varying_trapezoidal_loads
+  - concentrated_applied_moments
+  - mixed_loading
+  - moving_axle_patterns_with_direct_step_envelopes
+stiffness:
+  - constant_EI
+  - piecewise_variable_EI
+optional_analysis_effects:
+  shear_deformation:
+    requires: [G_ksi, Av_in2]
+    note: Av_in2 is the effective shear area; juniorSE will not invent a shear correction factor.
+  second_order:
+    requires: [axial_force_lb]
+    convention: positive compression, negative tension
+    note: This is an elastic geometric-stiffness analysis aid and is not a complete AISC 360-16 Direct Analysis Method implementation.
+  torsion:
+    requires: [explicit_torsional_restraint, GJ]
+    supports:
+      - point_torques
+      - linearly_varying_distributed_torques
+      - piecewise_variable_GJ
+    excludes:
+      - warping_torsion
+      - bimoment
+      - warping_normal_stress
 load_categories:
   - dead
   - live
-required_inputs:
-  - load_level
-  - span_ft_or_spans_ft
-  - supports_or_support_condition
-required_for_deflection_or_indeterminate_analysis:
-  - E_ksi
-  - Ix_in4
 serviceability_defaults:
   live_load_limit: L/240
   total_load_limit: L/360
+aisc_context:
+  standard: ANSI/AISC 360-16
+  note: AISC 360-16 Chapter C requires consideration of second-order effects and stability in applicable steel design; this analysis skill does not itself perform a complete Direct Analysis Method check.
 manual_alignment:
-  table_3_22a: Concentrated loads are analyzed directly rather than converted to an approximate equivalent uniform load.
-  table_3_22b: Cantilever beam behavior is solved directly.
-  table_3_22c: Continuous beam behavior is solved directly.
-  table_3_23: Reaction, shear, moment, and deflection outputs are generated directly and benchmarked against standard closed-form cases.
-current_limits:
-  - constant_EI_across_the_beam
-  - no_applied_concentrated_moments_yet
-  - no_linearly_varying_or_trapezoidal_distributed_loads_yet
-  - no_support_settlement
-  - no_shear_deformation
-  - no_second_order_effects
-  - no_torsion
-  - no_composite_action
-  - no_moving_load_envelope
+  table_3_22a: Concentrated loads are retained and analyzed directly rather than converted to approximate uniform loads.
+  table_3_22b: Cantilever behavior is solved directly.
+  table_3_22c: Continuous multi-span behavior is solved directly.
+  table_3_23: Reaction, shear, moment, and deflection demand families are produced directly and benchmarked against closed-form mechanics.
 forbidden:
-  - Do not smear point loads into uniform loads when direct analysis is available.
-  - Do not use factored loads for serviceability comparisons.
-  - Do not invent stiffness for continuous or fixed-end beams.
-  - Do not present the beam-analysis result as an AISC member-capacity check.
+  - Do not invent E, I, G, Av, J, support settlement, torsional restraint, or axial force.
+  - Do not use factored loads for LL or D+L serviceability comparisons.
+  - Do not imply that beam support type automatically restrains torsion.
+  - Do not treat elastic geometric stiffness as a complete AISC Direct Analysis Method implementation.
+  - Do not treat Saint-Venant torsion as a substitute for warping-torsion analysis when warping matters.
+  - Do not present demand analysis as AISC member-capacity verification.
 definition_of_done:
-  - Geometry and supports validated.
-  - Loads validated and retained at their actual locations.
-  - Reactions reported at every support.
-  - Positive and negative moment envelope values reported.
+  - Geometry, supports, stiffness, and loads validated.
+  - Reactions reported at supports.
+  - Positive and negative bending demand reported.
   - Maximum absolute shear reported.
   - Deflection reported when stiffness is available.
-  - LL deflection compared with L/240 for service-level analysis.
-  - D+L deflection compared with L/360 for service-level analysis.
+  - Moving-load envelope reported when requested.
+  - Torsional torque and rotation reported when requested.
+  - LL and D+L deflection checked only when serviceability comparison is meaningful.
+  - Unified demand envelope returned for downstream design skills.
   - QA/QC notes and engineer review requirement included.

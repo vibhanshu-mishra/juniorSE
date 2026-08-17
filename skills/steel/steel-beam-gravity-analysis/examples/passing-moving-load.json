@@ -1,0 +1,14 @@
+{
+  "description": "Single moving 10-kip axle on a 20-ft simple beam.",
+  "inputs": {
+    "span_ft": 20,
+    "support_condition": "simple",
+    "load_level": "service",
+    "E_ksi": 29000,
+    "Ix_in4": 1000,
+    "moving_loads": [
+      {"name": "single axle", "category": "live", "step_ft": 0.25, "axles": [{"P_lb": 10000, "offset_ft": 0}]}
+    ]
+  },
+  "expected_behavior": "moving-load envelope reaches approximately PL/4 = 50 kip-ft at midspan"
+}
