@@ -2,11 +2,9 @@
 
 juniorSE is an open-source structural engineering skill library for AI-assisted design reasoning, bounded calculations, assumption control, and QA/QC under licensed engineer supervision.
 
-Repository: https://github.com/vibhanshu-mishra/juniorSE/tree/main
-
 The goal is not to replace engineering judgment. The goal is to make AI behave like a careful junior structural engineer: classify the task, identify the code path, ask for missing inputs, avoid silent assumptions, perform bounded calculations only when allowed, self-review, and hand off a reviewable result.
 
-## v0.2 contents
+## Contents
 
 This release contains the first five skills with a stronger machine-checkable structure.
 
@@ -64,7 +62,7 @@ That limitation is intentional. juniorSE should under-claim rather than over-cla
 
 ## Safety and liability
 
-These skills are for educational, preliminary, and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
+These skills are for preliminary and engineer-supervised workflows only. They do not replace a licensed professional engineer, project-specific judgment, local code interpretation, peer review, or final approval for construction.
 
 ## Running tests
 
@@ -74,8 +72,7 @@ From the repository root:
 python -m pytest
 ```
 
-
-## v0.3 update
+## Update
 
 The `select-load-combinations` skill has been upgraded from a validated skill to a bounded executable skill. It now includes:
 
