@@ -1,0 +1,7 @@
+skill_id: steel-shear-check
+level: executable
+code_basis: {primary: AISC 360-16, chapter: G}
+scope: [unstiffened_I_shape_web]
+required_inputs: [design_method,E_ksi,Fy_ksi,h_in,tw_in,required_shear_kips]
+kv: 5.34
+out_of_scope: [tension_field_action, transverse_stiffener_design]

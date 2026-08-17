@@ -1,0 +1,71 @@
+skill_id: steel-beam-gravity-check
+level: executable
+purpose: Orchestrate bounded AISC 360-16 steel beam analysis, serviceability, section classification, flexure, shear, and optional concentrated-force web local checks.
+uses_skills:
+  - steel-beam-gravity-analysis
+  - steel-section-classification
+  - steel-flexure-check
+  - steel-shear-check
+  - steel-web-local-checks
+  - select-load-combinations
+  - assumption-guardrails
+  - calculation-qaqc-review
+code_basis:
+  primary: AISC 360-16
+  classification_and_limits: Chapter B
+  flexure: Chapter F
+  shear: Chapter G
+  web_local_checks: Chapter J10.2 and J10.3
+current_scope:
+  - simply_supported_uniform_gravity_load
+  - noncomposite_doubly_symmetric_I_or_W_shape_major_axis_bending
+  - compact_web_with_compact_noncompact_or_slender_flange_flexure_routes_F2_F3
+  - unstiffened_web_shear_with_Cv1_calculation
+  - optional_web_local_yielding_and_crippling_for_concentrated_force_or_reaction
+  - serviceability_check
+blocked_currently:
+  - Chapter_F4_noncompact_web_flexure
+  - Chapter_F5_slender_web_flexure
+  - composite_beam_design
+  - continuous_beams
+  - point_load_analysis
+  - torsion
+  - biaxial_bending
+  - connection_or_bearing_plate_design
+required_inputs:
+  - code_family
+  - code_edition
+  - design_method
+  - span_ft
+  - dead_load_plf
+  - live_load_plf
+  - load_level
+  - support_condition
+  - bracing_condition
+  - steel_grade
+  - member_section
+  - composite_status
+  - E_ksi
+  - Fy_ksi
+  - Ix_in4
+  - Sx_in3
+  - Zx_in3
+  - d_in
+  - h_in
+  - tw_in
+  - bf_in
+  - tf_in
+  - ry_in
+  - rts_in
+  - J_in4
+  - ho_in
+  - Lb_ft
+  - Cb
+serviceability_defaults:
+  live_load_limit: L/240
+  total_load_limit: L/360
+optional_web_local_inputs:
+  - concentrated_force_kips
+  - bearing_length_N_in
+  - distance_from_end_in
+  - k_in

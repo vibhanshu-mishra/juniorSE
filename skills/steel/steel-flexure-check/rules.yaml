@@ -1,0 +1,6 @@
+skill_id: steel-flexure-check
+level: executable
+code_basis: {primary: AISC 360-16, chapter: F}
+implemented_routes: [F2, F3]
+blocked_routes: [F4, F5]
+required_inputs: [design_method, E_ksi, Fy_ksi, Sx_in3, Zx_in3, ry_in, rts_in, J_in4, ho_in, Lb_ft, Cb, flange_classification, web_classification, flange_lambda, flange_lambda_p, flange_lambda_r, h_in, tw_in, required_moment_kip_ft]

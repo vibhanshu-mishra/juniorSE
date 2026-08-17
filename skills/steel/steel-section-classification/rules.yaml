@@ -1,0 +1,19 @@
+skill_id: steel-section-classification
+level: executable
+code_basis:
+  primary: AISC 360-16
+  chapter: B
+scope:
+  - doubly_symmetric_I_or_W_shape
+  - major_axis_flexure_element_classification
+required_inputs: [E_ksi, Fy_ksi, bf_in, tf_in, h_in, tw_in]
+limits:
+  flange:
+    lambda_p: 0.38*sqrt(E/Fy)
+    lambda_r: 1.00*sqrt(E/Fy)
+  web:
+    lambda_p: 3.76*sqrt(E/Fy)
+    lambda_r: 5.70*sqrt(E/Fy)
+forbidden:
+  - Do not replace h/tw with d/tw.
+  - Do not use for non-I shapes.

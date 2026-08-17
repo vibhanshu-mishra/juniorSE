@@ -1,0 +1,5 @@
+skill_id: steel-web-local-checks
+level: executable
+code_basis: {primary: AISC 360-16, chapter: J, sections: [J10.2, J10.3]}
+required_inputs: [design_method,E_ksi,Fy_ksi,d_in,tw_in,tf_in,k_in,bearing_length_N_in,concentrated_force_kips,distance_from_end_in]
+out_of_scope: [bearing_plate_design, connection_design, web_sidesway_buckling, web_compression_buckling, stiffener_design]
