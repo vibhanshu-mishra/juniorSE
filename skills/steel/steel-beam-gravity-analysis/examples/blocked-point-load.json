@@ -1,8 +1,0 @@
-{
-  "span_ft": 20,
-  "dead_load_plf": 1000,
-  "live_load_plf": 2000,
-  "load_level": "service",
-  "support_condition": "simply_supported",
-  "point_loads": [{"P_lb": 5000, "x_ft": 10}]
-}
