@@ -1,114 +1,39 @@
 ---
 name: steel-beam-gravity-analysis
-category: structural-steel
-level: executable
-description: Calculate simple-span steel beam gravity analysis demands and service deflections for uniform dead and live loads under engineer supervision.
+description: Analyze common single- and multi-span beams under point and uniform gravity loads. Use this skill to obtain reactions, shear, moment, and deflection demands before material-specific strength checks.
 ---
 
 # steel-beam-gravity-analysis
 
-Use this skill to calculate bounded beam-level analysis results for a simply supported beam with uniform gravity loads.
-
-This skill computes demand and serviceability quantities only. It does not determine AISC member capacity, select a steel shape, verify lateral-torsional buckling capacity, classify compactness, or approve a final design.
-
 ## Trigger
-
-Use this skill when the user asks for:
-
-- reactions for a simple steel beam
-- maximum shear or moment for a uniform gravity load
-- live-load, dead-load, or total-load deflection for a simple span
-- the analysis-demand portion of a steel gravity beam check
-
-## Do not use when
-
-Do not use this skill for:
-
-- continuous beams
-- cantilevers
-- point loads or partial-length loads
-- composite beam action
-- lateral-system member design
-- steel capacity/pass-fail checks without the companion check skill
-- final stamped design
-
-## Required inputs
-
-- span_ft
-- dead_load_plf
-- live_load_plf
-- load_level: service or factored
-- support_condition: simply supported
-
-## Required for deflection
-
-- E_ksi
-- Ix_in4
-
-If `E_ksi` and `Ix_in4` are not provided, the skill may calculate reactions, shear, and moment, but it must report deflection as incomplete.
-
-## Default serviceability criteria
-
-When checking service deflection for this skill, use the following project standard unless the user provides different criteria:
-
-- Live Load deflection limit: **L/240**
-- Dead + Live Load deflection limit: **L/360**
-
-Do not silently swap these limits. If a different project criterion is given, report both the provided criterion and this default so the reviewer can see the change.
+Use when a beam needs structural analysis for gravity loading before a material-specific capacity check.
 
 ## Process
+1. Identify beam length or individual spans.
+2. Identify every support and support restraint.
+3. Preserve each load at its actual position; do not replace point loads with uniform loads unless an engineer explicitly requests an equivalent-load approximation.
+4. Separate dead and live service loads so service deflections can be checked independently.
+5. Require `E` and `I` for deflection and for indeterminate support systems.
+6. Solve the beam using a linear-elastic Euler-Bernoulli stiffness formulation.
+7. Report support reactions, positive and negative moment extremes, maximum absolute shear, and deflection.
+8. For service loads, compare live-load deflection with L/240 and dead-plus-live deflection with L/360.
+9. Hand calculated demands to the relevant material design skill; this skill does not determine AISC strength.
 
-1. Confirm the beam model is within scope: simply supported, uniform gravity loads.
-2. Confirm loads are service-level or factored.
-3. Calculate reactions, maximum shear, and maximum moment using the provided load cases.
-4. If section stiffness is provided, calculate elastic deflections separately for dead load, live load, and total dead + live load.
-5. Compare live-load deflection to L/240.
-6. Compare total dead + live deflection to L/360.
-7. Report whether each serviceability check passes, fails, or is incomplete.
-8. State that AISC strength/capacity checks are not performed by this analysis skill.
-9. Include QA/QC notes and engineer-review items.
+## AISC Manual alignment
+The 15th Edition Manual groups useful beam aids in Tables 3-22a through 3-22c and Table 3-23. juniorSE uses those table families as behavioral/reference categories rather than embedding a copyrighted lookup table:
 
-## Equations for current scope
-
-For a simply supported beam with uniform load:
-
-```text
-R = wL / 2
-Vmax = wL / 2
-Mmax = wL^2 / 8
-Delta_max = 5wL^4 / 384EI
-```
-
-Use consistent units. For deflection, convert span to inches, load to lb/in, E to psi, and Ix to in^4.
+- **Table 3-22a:** concentrated-load equivalents. juniorSE analyzes concentrated loads directly, so an equivalent uniform-load approximation is normally unnecessary.
+- **Table 3-22b:** cantilever beams. Cantilever restraint and gravity loads are solved directly.
+- **Table 3-22c:** continuous beams. Multi-span continuous systems are solved directly from support conditions and stiffness.
+- **Table 3-23:** shears, moments, and deflections. juniorSE directly returns these quantities and tests common closed-form cases that correspond to this family of beam diagrams.
 
 ## Guardrails
-
-- Do not use factored loads for serviceability deflection checks unless the user explicitly asks for factored-load deflection and it is labeled accordingly.
-- Do not claim member adequacy from analysis demand alone.
-- Do not proceed for non-simple-span or non-uniform load patterns.
-- Do not invent E or Ix. If stiffness data is missing, mark deflection incomplete.
+- Do not invent support fixity.
+- Do not invent `E` or `I` for an indeterminate beam.
+- Do not use factored loads for LL or D+L serviceability checks.
+- Do not infer load location from a sketch unless the location can be established reliably.
+- Stop if support configuration leaves the model unstable.
+- Current release assumes constant EI along the modeled beam.
 
 ## Definition of done
-
-This skill is complete only when the output includes:
-
-- input summary
-- scope confirmation
-- reactions
-- maximum shear
-- maximum moment
-- deflection results or a clear deflection-incomplete note
-- LL deflection compared to L/240 when stiffness is available
-- D+L deflection compared to L/360 when stiffness is available
-- QA/QC notes
-- engineer-review notes
-
-## Implementation files
-
-This juniorSE skill includes:
-
-- `rules.yaml`
-- `validator.py`
-- `calculator.py`
-- `examples/`
-- `tests/`
+A completed analysis identifies the support model and loads, provides reactions/shear/moment demand, reports deflection when stiffness is available, applies the juniorSE serviceability criteria to service loads, and explicitly states that member strength is checked elsewhere.

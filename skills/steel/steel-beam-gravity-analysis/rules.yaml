@@ -1,52 +1,70 @@
 skill_id: steel-beam-gravity-analysis
 level: executable
-purpose: Perform bounded simply supported uniform-load beam analysis and service deflection checks.
-current_scope:
-  - simply_supported_uniform_gravity_load
-  - reactions
-  - maximum_shear
-  - maximum_moment
-  - service_deflection_when_E_and_Ix_are_provided
+purpose: Perform linear-elastic beam analysis for common gravity-beam support and loading cases, including direct equivalents of the beam behaviors summarized in AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23.
+analysis_basis:
+  method: Euler-Bernoulli beam stiffness method
+  assumptions:
+    - linear_elastic
+    - small_displacement
+    - prismatic_constant_EI_in_current_release
+    - loads_act_in_primary_bending_plane
+supported_geometry:
+  - single_span
+  - multi_span_continuous
+supported_supports:
+  - pinned
+  - roller
+  - fixed
+  - simple_shorthand
+  - cantilever_shorthand
+  - fixed_fixed_shorthand
+  - propped_cantilever_shorthand
+supported_loads:
+  - full_span_uniform_dead_load
+  - full_span_uniform_live_load
+  - concentrated_point_loads
+  - partial_uniform_loads
+  - mixed_point_and_uniform_loads
+load_categories:
+  - dead
+  - live
 required_inputs:
-  - span_ft
-  - dead_load_plf
-  - live_load_plf
   - load_level
-  - support_condition
-required_for_deflection:
+  - span_ft_or_spans_ft
+  - supports_or_support_condition
+required_for_deflection_or_indeterminate_analysis:
   - E_ksi
   - Ix_in4
-allowed_load_levels:
-  - service
-  - factored
-allowed_support_conditions:
-  - simple
-  - simply_supported
-  - simply supported
 serviceability_defaults:
   live_load_limit: L/240
   total_load_limit: L/360
-stop_conditions:
-  - field: support_condition
-    message: Current executable scope only supports simply supported beams.
-  - field: load_level
-    message: Loads must be identified as service or factored.
-out_of_scope_currently:
-  - continuous_beams
-  - cantilevers
-  - point_loads
-  - partial_uniform_loads
-  - composite_action
-  - AISC_capacity_checks
-  - final_stamped_design
+manual_alignment:
+  table_3_22a: Concentrated loads are analyzed directly rather than converted to an approximate equivalent uniform load.
+  table_3_22b: Cantilever beam behavior is solved directly.
+  table_3_22c: Continuous beam behavior is solved directly.
+  table_3_23: Reaction, shear, moment, and deflection outputs are generated directly and benchmarked against standard closed-form cases.
+current_limits:
+  - constant_EI_across_the_beam
+  - no_applied_concentrated_moments_yet
+  - no_linearly_varying_or_trapezoidal_distributed_loads_yet
+  - no_support_settlement
+  - no_shear_deformation
+  - no_second_order_effects
+  - no_torsion
+  - no_composite_action
+  - no_moving_load_envelope
 forbidden:
-  - Do not use analysis-only outputs as a member-capacity pass/fail.
-  - Do not invent E or Ix for deflection.
-  - Do not silently change LL L/240 and D+L L/360 default criteria.
+  - Do not smear point loads into uniform loads when direct analysis is available.
+  - Do not use factored loads for serviceability comparisons.
+  - Do not invent stiffness for continuous or fixed-end beams.
+  - Do not present the beam-analysis result as an AISC member-capacity check.
 definition_of_done:
-  - Required analysis inputs validated.
-  - Reactions, maximum shear, and maximum moment calculated.
-  - Deflection reported as checked or incomplete.
-  - Live-load deflection compared to L/240 when stiffness is available.
-  - Total-load deflection compared to L/360 when stiffness is available.
-  - QA/QC and engineer review notes included.
+  - Geometry and supports validated.
+  - Loads validated and retained at their actual locations.
+  - Reactions reported at every support.
+  - Positive and negative moment envelope values reported.
+  - Maximum absolute shear reported.
+  - Deflection reported when stiffness is available.
+  - LL deflection compared with L/240 for service-level analysis.
+  - D+L deflection compared with L/360 for service-level analysis.
+  - QA/QC notes and engineer review requirement included.

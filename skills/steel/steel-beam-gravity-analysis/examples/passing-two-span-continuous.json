@@ -1,0 +1,13 @@
+{
+  "spans_ft": [10, 10],
+  "supports": [
+    {"x_ft": 0, "type": "pinned"},
+    {"x_ft": 10, "type": "roller"},
+    {"x_ft": 20, "type": "roller"}
+  ],
+  "load_level": "service",
+  "dead_load_plf": 1000,
+  "live_load_plf": 0,
+  "E_ksi": 29000,
+  "Ix_in4": 1000
+}

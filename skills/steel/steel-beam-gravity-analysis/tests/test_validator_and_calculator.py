@@ -30,21 +30,20 @@ def test_analysis_validator_ready_for_simple_uniform_beam():
     assert result["deflection_ready"] is True
 
 
-def test_analysis_blocks_point_loads():
+def test_analysis_accepts_categorized_point_loads():
     inputs = dict(BASE_INPUTS)
-    inputs["point_loads"] = [{"P_lb": 5000, "x_ft": 10}]
+    inputs["point_loads"] = [{"P_lb": 5000, "x_ft": 10, "category": "live"}]
     result = validator.validate(inputs)
-    assert result["status"] == "blocked"
-    assert "point loads" in result["errors"][0]
+    assert result["status"] == "ready"
 
 
 def test_analysis_demands_for_simple_uniform_loads():
     result = calculator.calculate(BASE_INPUTS)
     total = result["analysis_results"]["dead_plus_live"]
-    assert result["status"] == "complete_analysis_only"
-    assert total["reaction_each_end_lb"] == 30000
-    assert total["max_shear_lb"] == 30000
-    assert total["max_moment_kip_ft"] == 150
+    assert result["status"] == "complete_general_beam_analysis"
+    assert abs(total["support_reactions"][0]["vertical_lb"] - 30000) < 1
+    assert abs(total["max_abs_shear_kips"] - 30) < 0.05
+    assert abs(total["max_positive_moment_kip_ft"] - 150) < 0.05
 
 
 def test_analysis_serviceability_uses_live_L_over_240_and_total_L_over_360():

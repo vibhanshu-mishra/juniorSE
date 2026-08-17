@@ -1,90 +1,67 @@
-"""Validator for juniorSE steel-beam-gravity-analysis skill."""
 from __future__ import annotations
-
-from pathlib import Path
 from typing import Any, Dict, List
 
-try:
-    import yaml  # type: ignore
-except Exception:  # pragma: no cover
-    yaml = None
-
-EMBEDDED_RULES = {
-    "required_inputs": ["span_ft", "dead_load_plf", "live_load_plf", "load_level", "support_condition"],
-    "required_for_deflection": ["E_ksi", "Ix_in4"],
-    "allowed_load_levels": ["service", "factored"],
-    "allowed_support_conditions": ["simple", "simply_supported", "simply supported"],
-}
+ALLOWED_SUPPORT_TYPES={'pinned','roller','fixed'}
+ALLOWED_SHORTHANDS={'simple','simply_supported','simply supported','cantilever','fixed_fixed','fixed-fixed','propped_cantilever','propped-cantilever'}
 
 
-def load_rules() -> Dict[str, Any]:
-    rules_path = Path(__file__).with_name("rules.yaml")
-    if yaml is not None and rules_path.exists():
-        return yaml.safe_load(rules_path.read_text())
-    return EMBEDDED_RULES
+def _num(v):
+    try: return float(v)
+    except (TypeError, ValueError): return None
 
 
-def _is_missing(value: Any) -> bool:
-    return value in (None, "", [])
+def validate(inputs: Dict[str,Any], rules=None)->Dict[str,Any]:
+    errors:List[str]=[]; warnings:List[str]=[]; missing=[]
+    load_level=str(inputs.get('load_level','')).lower()
+    if not load_level: missing.append('load_level')
+    elif load_level not in {'service','factored'}: errors.append('load_level must be service or factored.')
 
-
-def _is_positive_number(value: Any) -> bool:
-    try:
-        return float(value) > 0
-    except (TypeError, ValueError):
-        return False
-
-
-def _is_nonnegative_number(value: Any) -> bool:
-    try:
-        return float(value) >= 0
-    except (TypeError, ValueError):
-        return False
-
-
-def validate(inputs: Dict[str, Any], rules: Dict[str, Any] | None = None) -> Dict[str, Any]:
-    rules = rules or load_rules()
-    missing = [field for field in rules["required_inputs"] if _is_missing(inputs.get(field))]
-    errors: List[str] = []
-    warnings: List[str] = []
-
-    if not _is_missing(inputs.get("span_ft")) and not _is_positive_number(inputs.get("span_ft")):
-        errors.append("span_ft must be a positive number.")
-
-    for field in ("dead_load_plf", "live_load_plf"):
-        if not _is_missing(inputs.get(field)) and not _is_nonnegative_number(inputs.get(field)):
-            errors.append(f"{field} must be a nonnegative number.")
-
-    load_level = inputs.get("load_level")
-    if load_level and str(load_level).lower() not in rules.get("allowed_load_levels", []):
-        errors.append("load_level must be service or factored.")
-
-    support_condition = inputs.get("support_condition")
-    if support_condition and str(support_condition).lower() not in set(rules.get("allowed_support_conditions", [])):
-        errors.append("Current executable scope only supports simply supported beams.")
-
-    if inputs.get("point_loads"):
-        errors.append("Current executable scope does not support point loads yet.")
-    if inputs.get("partial_uniform_loads"):
-        errors.append("Current executable scope does not support partial uniform loads yet.")
-
-    deflection_missing = [field for field in rules.get("required_for_deflection", []) if _is_missing(inputs.get(field))]
-    if deflection_missing:
-        warnings.append("Deflection check is incomplete unless E_ksi and Ix_in4 are provided.")
+    spans=inputs.get('spans_ft')
+    span=inputs.get('span_ft')
+    if spans in (None,[]) and span in (None,''): missing.append('span_ft or spans_ft')
+    if spans not in (None,[]):
+        if not isinstance(spans,list) or any((_num(x) is None or _num(x)<=0) for x in spans): errors.append('spans_ft must be a list of positive numbers.')
+        total=sum(float(x) for x in spans) if isinstance(spans,list) and spans else 0
     else:
-        for field in rules.get("required_for_deflection", []):
-            if not _is_positive_number(inputs.get(field)):
-                errors.append(f"{field} must be a positive number for deflection calculation.")
+        n=_num(span); total=n or 0
+        if span not in (None,'') and (n is None or n<=0): errors.append('span_ft must be positive.')
 
-    if str(load_level).lower() == "factored":
-        warnings.append("Loads are marked factored. Serviceability comparisons should normally use service-level loads.")
+    supports=inputs.get('supports')
+    shorthand=str(inputs.get('support_condition','')).lower() if inputs.get('support_condition') is not None else ''
+    if not supports and not shorthand: missing.append('supports or support_condition')
+    if shorthand and shorthand not in ALLOWED_SHORTHANDS: errors.append('Unsupported support_condition shorthand.')
+    if supports:
+        if not isinstance(supports,list) or len(supports)<1: errors.append('supports must be a nonempty list.')
+        else:
+            for s in supports:
+                if str(s.get('type','')).lower() not in ALLOWED_SUPPORT_TYPES: errors.append('Each support type must be pinned, roller, or fixed.')
+                x=_num(s.get('x_ft'))
+                if x is None or x<0 or (total and x>total): errors.append('Each support x_ft must lie on the beam.')
+            valid_supports=[s for s in supports if str(s.get('type','')).lower() in ALLOWED_SUPPORT_TYPES]
+            distinct_x={float(s['x_ft']) for s in valid_supports if _num(s.get('x_ft')) is not None}
+            has_fixed=any(str(s.get('type','')).lower()=='fixed' for s in valid_supports)
+            if not has_fixed and len(distinct_x)<2:
+                errors.append('Support configuration is unstable for beam bending analysis: provide a fixed support or at least two vertical supports at distinct locations.')
 
-    status = "ready" if not missing and not errors else "blocked"
-    return {
-        "status": status,
-        "missing_inputs": missing,
-        "errors": errors,
-        "warnings": warnings,
-        "deflection_ready": not deflection_missing and not any(field in err for field in ("E_ksi", "Ix_in4") for err in errors),
-        "engineer_review_required": True,
-    }
+    for fld in ('dead_load_plf','live_load_plf'):
+        if fld in inputs and inputs[fld] not in (None,''):
+            n=_num(inputs[fld]);
+            if n is None or n<0: errors.append(f'{fld} must be nonnegative.')
+    for p in inputs.get('point_loads',[]) or []:
+        P=_num(p.get('P_lb')); x=_num(p.get('x_ft'))
+        if P is None or P<0: errors.append('Point loads require nonnegative P_lb.')
+        if x is None or x<0 or (total and x>total): errors.append('Point-load x_ft must lie on the beam.')
+        if str(p.get('category','')).lower() not in {'dead','live'}: errors.append('Point-load category must be dead or live.')
+    for u in inputs.get('uniform_loads',[]) or []:
+        w=_num(u.get('w_plf')); a=_num(u.get('x_start_ft')); b=_num(u.get('x_end_ft'))
+        if w is None or w<0: errors.append('Uniform loads require nonnegative w_plf.')
+        if a is None or b is None or a<0 or b<=a or (total and b>total): errors.append('Uniform-load limits must satisfy 0 <= x_start_ft < x_end_ft <= beam length.')
+        if str(u.get('category','')).lower() not in {'dead','live'}: errors.append('Uniform-load category must be dead or live.')
+
+    E=_num(inputs.get('E_ksi')); I=_num(inputs.get('Ix_in4'))
+    stiffness_ready=E is not None and E>0 and I is not None and I>0
+    indeterminate = bool(supports and (len(supports)>2 or any(str(s.get('type','')).lower()=='fixed' for s in supports))) or shorthand in {'fixed_fixed','fixed-fixed','propped_cantilever','propped-cantilever'}
+    if indeterminate and not stiffness_ready: errors.append('E_ksi and Ix_in4 are required for indeterminate beam analysis and deflection.')
+    elif not stiffness_ready: warnings.append('Deflection requires E_ksi and Ix_in4; force results may still be available for statically determinate cases.')
+    if load_level=='factored': warnings.append('Serviceability checks require service-level loads.')
+    return {'status':'ready' if not missing and not errors else 'blocked','missing_inputs':missing,'errors':errors,'warnings':warnings,'deflection_ready':stiffness_ready,'engineer_review_required':True}

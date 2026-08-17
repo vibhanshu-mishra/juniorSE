@@ -1,0 +1,10 @@
+{
+  "span_ft": 20,
+  "support_condition": "simple",
+  "load_level": "service",
+  "dead_load_plf": 0,
+  "live_load_plf": 0,
+  "point_loads": [{"P_lb": 10000, "x_ft": 10, "category": "live"}],
+  "E_ksi": 29000,
+  "Ix_in4": 1000
+}
