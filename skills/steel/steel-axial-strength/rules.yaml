@@ -1,0 +1,30 @@
+skill_id: steel.axial_strength
+name: steel-axial-strength
+level: executable
+purpose: Route signed axial demand to the validated AISC 360-16 Chapter D tension or Chapter E compression skill and normalize the result for downstream combined-force checks.
+
+sign_convention:
+  required: tension_positive
+  interpretation:
+    positive: tension
+    negative: compression
+    zero: no_axial_demand
+
+required_inputs:
+  - sign_convention
+  - required_axial_kip
+  - member_inputs
+
+guardrails:
+  - Do not duplicate Chapter D or Chapter E design equations in this orchestrator.
+  - Do not overwrite user-supplied required_tension_kip or required_compression_kip inside member_inputs; conflicting demand fields block the skill.
+  - Preserve all missing-input and stop conditions from the child tension/compression skill.
+  - Do not infer shear-lag, net area, effective-length factors, or Chapter E4 review status.
+  - Zero axial demand may return a zero-demand standardized result without invoking Chapter D or E.
+
+definition_of_done:
+  - Signed axial force is classified as tension, compression, or zero.
+  - The correct child skill is invoked for nonzero force.
+  - Child blocks are propagated.
+  - A standardized axial_strength_result is returned for complete cases.
+  - Engineer review remains required.

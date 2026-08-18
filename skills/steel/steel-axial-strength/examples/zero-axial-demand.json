@@ -1,0 +1,5 @@
+{
+  "sign_convention": "tension_positive",
+  "required_axial_kip": 0.0,
+  "member_inputs": {}
+}
