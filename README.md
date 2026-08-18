@@ -415,4 +415,4 @@ Outputs require review by a qualified structural engineer and are not a substitu
 - professional responsibility
 - responsible charge by the engineer of record
 
-The project is designed to make AI-assisted structural work more disciplined, transparent, testable, and reviewable—not autonomous.
+The project is designed to make AI-assisted structural work more disciplined, transparent, testable, and reviewable, not autonomous.
