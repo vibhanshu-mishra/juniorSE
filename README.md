@@ -113,6 +113,33 @@ The intent is that **Markdown teaches the method, rules constrain the method, Py
 
 ---
 
+
+## ASCE 7 Chapter 2 load combinations
+
+`select-load-combinations` is an edition-aware Chapter 2 router/evaluator for **ASCE 7-16** and **ASCE 7-22**.
+
+Current executable scope includes:
+
+- basic LRFD and ASD combinations
+- ASCE 7-16 vs ASCE 7-22 companion-load differences
+- `F` fluid-load inclusion with the applicable dead-load factor
+- explicit `H` stabilizing/destabilizing handling
+- wind directionality
+- ASCE 7-22 tornado effect `WT` routing
+- ASCE 7-16 legacy resolved seismic effect `E`
+- ASCE 7-22 resolved `Ev` + `Eh` / `Emh` seismic combination routing
+- governing positive, negative, and absolute scalar effects
+- serviceability routing outside strength-combination generation
+
+The skill also recognizes the Chapter 2 families for flood, atmospheric ice / wind-on-ice, self-straining effects, nonspecified loads, extraordinary events, general structural integrity, and the ASCE 7-22 alternative water-in-soil method. These special families currently require **explicitly resolved code-defined combinations** rather than allowing juniorSE to invent unverified factors.
+
+Edition-specific machine-readable metadata lives in:
+
+```text
+skills/loads/select-load-combinations/rules/asce7_16.yaml
+skills/loads/select-load-combinations/rules/asce7_22.yaml
+```
+
 ## Current steel skill stack
 
 The current steel workflow is intentionally modular:
