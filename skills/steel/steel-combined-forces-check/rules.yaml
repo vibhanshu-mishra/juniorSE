@@ -1,0 +1,21 @@
+skill_id: steel-combined-forces-check
+level: executable
+code_basis:
+  primary: AISC 360-16
+  chapter: H1
+uses_skills:
+  - steel-axial-strength
+  - steel-flexure-check
+  - steel-minor-axis-flexure-check
+implemented_scope:
+  - doubly symmetric I-shaped members
+  - axial tension plus flexure
+  - axial compression plus flexure
+  - major-axis and minor-axis flexure interaction
+  - H1-1a and H1-1b routing
+required_analysis_guardrail: required strengths must come from an explicitly acknowledged second-order or Chapter C-compatible analysis basis
+not_certified:
+  - global Chapter C stability compliance
+  - torsion interaction
+  - members outside the child-skill scopes
+  - H2 and H3 specialized interaction provisions

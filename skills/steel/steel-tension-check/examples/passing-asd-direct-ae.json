@@ -1,0 +1,11 @@
+{
+  "description": "ASD tension check with effective net area supplied directly.",
+  "input": {
+    "design_method": "ASD",
+    "Fy_ksi": 50.0,
+    "Fu_ksi": 65.0,
+    "Ag_in2": 10.0,
+    "Ae_in2": 7.65,
+    "required_tension_kip": 200.0
+  }
+}

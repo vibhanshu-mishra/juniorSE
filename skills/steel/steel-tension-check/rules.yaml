@@ -1,0 +1,51 @@
+skill_id: steel-tension-check
+level: executable
+code_basis:
+  primary: AISC 360-16
+  chapter: D
+purpose: >
+  Perform an engineer-supervised axial tension strength check using gross-section yielding
+  and net-section rupture, with explicit effective-net-area inputs and no invented connection data.
+implemented_limit_states:
+  - gross_section_yielding: Pn = Fy * Ag
+  - net_section_rupture: Pn = Fu * Ae
+available_strength_factors:
+  LRFD:
+    gross_section_yielding_phi: 0.90
+    net_section_rupture_phi: 0.75
+  ASD:
+    gross_section_yielding_omega: 1.67
+    net_section_rupture_omega: 2.00
+required_inputs:
+  - design_method
+  - Fy_ksi
+  - Fu_ksi
+  - Ag_in2
+  - required_tension_kip
+effective_net_area_paths:
+  - provide Ae_in2 directly
+  - provide An_in2 and U, with Ae = An * U
+guardrails:
+  - do not invent hole diameters or net area
+  - do not invent shear-lag factor U
+  - block a complete tension check when no effective-net-area path is available
+  - Ae_in2 must not exceed Ag_in2
+  - An_in2 must not exceed Ag_in2
+  - 0 < U <= 1.0
+  - connection block shear and connection strength are outside this skill
+  - engineer review required
+optional_checks:
+  slenderness:
+    inputs: [member_length_in, r_min_in]
+    advisory_limit_L_over_r: 300
+    behavior: advisory_only
+standardized_output:
+  key: axial_strength_result
+  fields:
+    - force_type
+    - chapter
+    - required_strength_kip
+    - available_strength_kip
+    - dcr
+    - governing_limit_state
+    - passes

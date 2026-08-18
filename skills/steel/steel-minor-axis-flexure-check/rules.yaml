@@ -1,0 +1,25 @@
+skill_id: steel-minor-axis-flexure-check
+level: executable
+code_basis:
+  primary: AISC 360-16
+  chapter: F6
+scope:
+  - doubly symmetric I-shaped members
+  - minor-axis flexure
+  - yielding
+  - flange local buckling
+blocked_or_deferred:
+  - channels
+  - singly symmetric members
+  - non-I-shapes
+  - torsion
+  - Chapter H interaction itself
+required_inputs:
+  - design_method
+  - E_ksi
+  - Fy_ksi
+  - Sy_in3
+  - Zy_in3
+  - bf_in
+  - tf_in
+  - required_moment_kip_ft

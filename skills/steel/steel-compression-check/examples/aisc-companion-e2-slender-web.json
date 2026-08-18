@@ -1,0 +1,27 @@
+{
+  "benchmark": "AISC 15th Edition Companion Example E.2 - built-up column with slender web",
+  "inputs": {
+    "design_method": "LRFD",
+    "section_type": "built_up_I",
+    "Fy_ksi": 50.0,
+    "E_ksi": 29000.0,
+    "Ag_in2": 19.8,
+    "required_compression_kip": 420.0,
+    "Lx_in": 180.0,
+    "Ly_in": 180.0,
+    "Kx": 1.0,
+    "Ky": 1.0,
+    "rx_in": 6.0,
+    "ry_in": 2.08,
+    "bf_in": 8.0,
+    "tf_in": 1.0,
+    "h_in": 15.0,
+    "tw_in": 0.25,
+    "e4_review_status": "checked_separately_non_governing"
+  },
+  "expected_approx": {
+    "Fcr_ksi": 28.9,
+    "effective_area_in2": 19.2,
+    "available_strength_kip": 500
+  }
+}

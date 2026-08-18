@@ -1,0 +1,22 @@
+{
+  "scenario": "Chapter E4 applicability has not been established",
+  "inputs": {
+    "design_method": "LRFD",
+    "section_type": "rolled_I",
+    "Fy_ksi": 50.0,
+    "E_ksi": 29000.0,
+    "Ag_in2": 26.5,
+    "required_compression_kip": 500.0,
+    "Lx_in": 240.0,
+    "Ly_in": 240.0,
+    "Kx": 1.0,
+    "Ky": 1.0,
+    "rx_in": 6.14,
+    "ry_in": 3.70,
+    "bf_in": 14.52,
+    "tf_in": 0.711765,
+    "h_in": 12.95,
+    "tw_in": 0.5
+  },
+  "expected_status": "blocked"
+}

@@ -1,0 +1,12 @@
+{
+  "description": "Blocked because An is known but U is not; juniorSE must not invent shear lag.",
+  "input": {
+    "design_method": "LRFD",
+    "Fy_ksi": 50.0,
+    "Fu_ksi": 65.0,
+    "Ag_in2": 10.0,
+    "An_in2": 8.5,
+    "required_tension_kip": 300.0
+  },
+  "expected_status": "blocked"
+}
