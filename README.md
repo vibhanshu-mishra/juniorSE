@@ -125,10 +125,17 @@ standardized demand envelope
 steel-section-classification
             ↓
 steel-flexure-check
+steel-minor-axis-flexure-check
 steel-shear-check
 steel-web-local-checks
+steel-tension-check
+steel-compression-check
             ↓
-steel-beam-gravity-check
+steel-axial-strength
+            ↓
+steel-combined-forces-check
+            ↓
+steel-beam-gravity-check / future steel-member-check
             ↓
 governing result + QA/QC
 ```
@@ -138,8 +145,13 @@ governing result + QA/QC
 - `steel-beam-gravity-analysis`
 - `steel-section-classification`
 - `steel-flexure-check`
+- `steel-minor-axis-flexure-check`
 - `steel-shear-check`
 - `steel-web-local-checks`
+- `steel-tension-check`
+- `steel-compression-check`
+- `steel-axial-strength`
+- `steel-combined-forces-check`
 - `steel-beam-gravity-check`
 
 `steel-beam-gravity-check` acts as the orchestration skill. It consumes analysis results and routes the relevant demands into the reusable design skills.
@@ -204,15 +216,67 @@ The current steel design path uses AISC 360-16 and includes:
 - flexural-element classification for the currently supported doubly symmetric I-shaped/W-shape path
 - compact, noncompact, and slender classification logic used to route the member to the applicable Chapter F path
 
+
+### Chapter D — Tension members
+
+- gross-section yielding
+- net-section rupture
+- effective net area supplied directly or calculated as `Ae = An × U`
+- explicit shear-lag guardrail: juniorSE does not invent `U`
+- ASD/LRFD available tension strength and DCR
+- optional `L/r` advisory when member length and minimum radius of gyration are supplied
+
+Connection block shear, bolt/weld strength, and connection design remain outside this skill.
+
+### Chapter E — Compression members
+
+- flexural buckling about both principal axes for supported doubly symmetric rolled and built-up I-shapes
+- explicit `Kx` and `Ky`; juniorSE does not assume effective-length factors
+- Chapter B axial-compression flange/web slenderness routing
+- **E3** nonslender-member flexural buckling
+- **E7** effective-width/effective-area treatment for supported slender I-shape flanges and webs
+- ASD/LRFD available compression strength and DCR
+- standardized `axial_strength_result` for Chapter H orchestration
+
+Chapter E4 torsional/flexural-torsional buckling is not yet calculated. The skill requires that its applicability be explicitly reviewed rather than silently ignored.
+
+### Axial-strength orchestration
+
+`steel-axial-strength` provides a single signed-force interface for axial member checks:
+
+- positive axial demand routes to `steel-tension-check` / Chapter D
+- negative axial demand routes to `steel-compression-check` / Chapter E
+- zero axial demand returns a zero-demand result without invoking a design chapter
+- child-skill guardrails and blocked states are preserved
+- the orchestrator does not duplicate Chapter D or Chapter E equations
+- successful results are normalized into a common `axial_strength_result` contract for Chapter H interaction
+
+The Phase 3C sign convention is explicit: `tension_positive`.
+
 ### Chapter F — Flexure
 
 - **F2** — compact web / compact flange major-axis flexure
 - **F3** — compact web with noncompact or slender flange
 - **F4** — supported doubly symmetric I-shaped members with noncompact webs
 - **F5** — supported doubly symmetric I-shaped members with slender webs
-- yielding and lateral-torsional-buckling paths applicable to the implemented cases
+- **F6** — bounded minor-axis flexure for doubly symmetric I-shaped members, including yielding and flange local buckling
+- yielding and lateral-torsional-buckling paths applicable to the implemented major-axis cases
 - compression-flange local-buckling behavior for the implemented cases
 - ASD/LRFD available strength and demand-capacity reporting
+
+
+### Chapter H — Combined axial force and flexure
+
+- **H1** interaction for the currently supported doubly symmetric I-shaped member path
+- axial tension strength supplied by Chapter D through `steel-axial-strength`
+- axial compression strength supplied by Chapter E through `steel-axial-strength`
+- major-axis flexural strength supplied by `steel-flexure-check`
+- minor-axis flexural strength supplied by `steel-minor-axis-flexure-check` / F6
+- explicit routing between H1-1a and H1-1b based on axial utilization `Pr/Pc`
+- component ratios `Pr/Pc`, `Mrx/Mcx`, and `Mry/Mcy` are reported separately
+- required strengths must come from an explicitly acknowledged second-order or Chapter C-compatible analysis basis
+
+The current Chapter H skill does **not** independently certify global Chapter C stability compliance and does not cover torsion or specialized H2/H3 interaction provisions.
 
 ### Chapter G — Shear
 
@@ -309,10 +373,7 @@ Current notable limitations include:
 - composite beam design
 - restrained-warping torsion
 - torsional strength interaction
-- full axial tension strength
-- full axial compression strength
-- Chapter H axial + flexure interaction
-- biaxial beam-column strength interaction
+- Chapter E4 torsional/flexural-torsional compression buckling
 - connection design
 - bearing-plate design
 
@@ -359,13 +420,12 @@ The objective is a result that a structural engineer can review—not an opaque 
 
 ## Roadmap
 
-The next major steel milestone is **full axial strength and Chapter H interaction**.
+The next major steel milestone is **Phase 3D: Chapter H axial + flexure interaction**, using the standardized axial-strength interface from Phase 3C.
 
 Planned areas include:
 
-- Chapter D tension-member strength
-- Chapter E compression-member strength
-- Chapter H axial + flexure interaction
+- expanded Chapter E shape families and Chapter E4 buckling
+- integration of standardized axial strength with major/minor-axis flexure
 - biaxial interaction
 - expanded torsional design behavior
 - additional steel-member and system skills
@@ -415,4 +475,4 @@ Outputs require review by a qualified structural engineer and are not a substitu
 - professional responsibility
 - responsible charge by the engineer of record
 
-The project is designed to make AI-assisted structural work more disciplined, transparent, testable, and reviewable, not autonomous.
+The project is designed to make AI-assisted structural work more disciplined, transparent, testable, and reviewable—not autonomous.
