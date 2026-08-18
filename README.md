@@ -1,76 +1,418 @@
 # juniorSE
 
-juniorSE is an open-source structural engineering skill library for AI-assisted, engineer-supervised structural design and analysis.
+**juniorSE** is an open-source structural engineering skill library for AI-assisted, engineer-supervised design and analysis.
 
-The project is designed to make an AI behave more like a disciplined junior structural engineer: validate inputs, refuse unsupported assumptions, follow a defined code path, perform bounded calculations, run QA/QC, and hand back reviewable engineering work.
+The goal is simple: give an AI a disciplined structural-engineering workflow so it behaves less like a general-purpose chatbot and more like a careful junior structural engineer working under review.
 
-## Skill standard
-Validated and executable skills include:
-- `SKILL.md`
-- `rules.yaml`
-- `validator.py`
-- `examples/`
-- `tests/`
+juniorSE is designed to make an AI:
 
-Executable skills additionally include `calculator.py`.
+- identify what kind of structural task it has been given
+- determine which inputs and assumptions are required
+- stop when critical information is missing
+- avoid inventing engineering assumptions
+- follow an explicit code and calculation path
+- perform bounded analysis and design checks
+- run QA/QC before presenting results
+- explain what governed and why
+- clearly identify what still requires engineer review
 
-## Current steel stack
+It is **not** intended to replace a structural engineer, professional judgment, project-specific code interpretation, or responsible charge.
+
+---
+
+## Why juniorSE exists
+
+Large language models can do arithmetic, explain structural concepts, and often reproduce familiar engineering equations. That does not make them reliable structural engineers.
+
+The larger failure modes are usually procedural:
+
+- starting a calculation before enough information is known
+- silently assuming material properties, support conditions, bracing, or code criteria
+- mixing ASD and LRFD demand/capacity paths
+- checking one limit state while forgetting another
+- losing important load-case or governing-location information
+- using an equation outside its valid range
+- returning a confident answer when the correct response should be: **"I cannot complete this check until I know X."**
+
+juniorSE addresses that problem by encoding structural-engineering work as reusable, testable skills with explicit guardrails.
+
+---
+
+## Core principles
+
+### 1. No silent engineering assumptions
+
+If a missing input materially affects demand, capacity, stability, serviceability, or code applicability, juniorSE must either:
+
+- request the missing information, or
+- proceed only under an explicitly stated and permitted preliminary assumption.
+
+Critical assumptions must never be invented silently.
+
+### 2. Block unsupported paths
+
+If a skill does not implement the applicable engineering path, it should stop and say so.
+
+juniorSE should prefer:
+
+> This condition requires a design path that is not yet implemented.
+
+instead of forcing the problem through a simpler but incorrect equation.
+
+### 3. Separate analysis from design
+
+Analysis produces demands.
+
+Design skills evaluate those demands against code-based strength and serviceability requirements.
+
+This separation allows the same design skills to work whether the governing demand came from a uniform load, point load, continuous beam, settlement, moving load, or another supported analysis case.
+
+### 4. Human-readable and machine-testable
+
+Skills should be understandable by structural engineers and also verifiable by software.
+
+### 5. Engineer review is always required
+
+juniorSE is an engineering assistant, not an engineer of record.
+
+---
+
+## Skill architecture
+
+A juniorSE skill is a reusable engineering method rather than a one-off prompt.
+
+Validated and executable skills follow a common structure:
+
+```text
+skill-name/
+├── SKILL.md
+├── rules.yaml
+├── validator.py
+├── examples/
+└── tests/
+```
+
+Executable skills additionally include:
+
+```text
+calculator.py
+```
+
+### What each file does
+
+| File | Purpose |
+|---|---|
+| `SKILL.md` | Human-readable engineering workflow, trigger, process, guardrails, and definition of done |
+| `rules.yaml` | Machine-readable required inputs, stop conditions, supported paths, and constraints |
+| `validator.py` | Enforces input completeness and guardrails before calculation |
+| `calculator.py` | Performs bounded calculation or analysis logic for executable skills |
+| `examples/` | Passing, blocked, edge-case, and benchmark examples |
+| `tests/` | Automated regression and validation tests |
+
+The intent is that **Markdown teaches the method, rules constrain the method, Python executes or validates it, and tests prove expected behavior.**
+
+---
+
+## Current steel skill stack
+
+The current steel workflow is intentionally modular:
+
+```text
+steel-beam-gravity-analysis
+            ↓
+standardized demand envelope
+            ↓
+steel-section-classification
+            ↓
+steel-flexure-check
+steel-shear-check
+steel-web-local-checks
+            ↓
+steel-beam-gravity-check
+            ↓
+governing result + QA/QC
+```
+
+### Available steel skills
+
 - `steel-beam-gravity-analysis`
 - `steel-section-classification`
 - `steel-flexure-check`
 - `steel-shear-check`
 - `steel-web-local-checks`
-- `steel-beam-gravity-check` (orchestrator)
+- `steel-beam-gravity-check`
 
-### AISC 360-16 scope through v0.9
-- Chapter B flexural element classification for doubly symmetric I/W shapes.
-- Chapter F2 compact-web/compact-flange major-axis flexure.
-- Chapter F3 compact-web/noncompact-or-slender-flange major-axis flexure.
-- Chapter F4 doubly symmetric I-shaped members with noncompact webs.
-- Chapter F5 doubly symmetric I-shaped members with slender webs.
-- Chapter G unstiffened-web shear with calculated `Cv1`.
-- Chapter J10.2 web local yielding.
-- Chapter J10.3 web local crippling.
-- Live-load deflection limit: `L/240`.
-- Dead + live deflection limit: `L/360`.
+`steel-beam-gravity-check` acts as the orchestration skill. It consumes analysis results and routes the relevant demands into the reusable design skills.
 
-### Phase 1B benchmark policy
-- F4 is regression-tested against AISC 15th Edition Manual Companion v15.1, Volume 1, Example F.15 (Plate Girder Flexural Member).
-- The Companion is keyed to ANSI/AISC 360-16.
-- No dedicated F5 slender-web Chapter F example was identified in the v15.1 Companion chapter examples. F5 is therefore tested equation-by-equation against the AISC 360-16 F5 framework and is not mislabeled as Companion-benchmarked.
+---
 
+## Current analysis capabilities
 
-### Phase 2 beam-analysis scope
-`steel-beam-gravity-analysis` now supports a direct finite-element demand engine for:
-- simple, cantilever, fixed, propped, and multi-span continuous beams
-- full-span and partial uniform loads
-- concentrated point loads and applied concentrated moments
-- triangular and trapezoidal line loads
+`steel-beam-gravity-analysis` uses direct beam analysis rather than relying on copied lookup-table coefficients.
+
+Supported behavior currently includes:
+
+- simple beams
+- cantilevers
+- fixed beams
+- propped cantilevers
+- multi-span continuous beams
+- full-span uniform loads
+- partial uniform loads
+- concentrated point loads
+- applied concentrated moments
+- triangular line loads
+- trapezoidal line loads
 - mixed loading
-- piecewise-variable EI
+- piecewise-variable `EI`
 - imposed vertical support settlements
 - moving axle-pattern envelopes
 - optional Timoshenko shear deformation with explicit `G` and effective `Av`
 - bounded elastic geometric-stiffness second-order analysis with explicit axial force
-- a separate Saint-Venant torsion channel with point/distributed torque and piecewise `GJ`
-- unified reaction/shear/moment/deflection/torsion demand envelopes
+- Saint-Venant torsion with point/distributed torque and piecewise `GJ`
 
-The implementation analyzes the actual system directly rather than copying Manual lookup tables. AISC 15th Edition Manual Tables 3-22a, 3-22b, 3-22c, and 3-23 remain reference/benchmark families.
+The analysis engine can produce standardized envelopes for:
 
-Second-order mode is deliberately labeled as an elastic geometric-stiffness analysis aid, **not** a complete AISC 360-16 Direct Analysis Method implementation. Torsion is Saint-Venant only; restrained warping remains outside Phase 2B.
+- reactions
+- shear
+- positive moment
+- negative moment
+- absolute governing moment
+- deflection
+- governing locations
+- moving-load effects
+- torsional demand where requested
 
-### Intentionally blocked / future phases
-- Singly symmetric F4/F5 member implementation.
-- Composite beams.
-- Restrained warping torsion and biaxial bending strength interaction.
-- Full axial tension/compression capacity and Chapter H beam-column interaction.
-- Connection and bearing-plate design.
+AISC Manual Tables 3-22a, 3-22b, 3-22c, and 3-23 are treated as useful reference and benchmark families, while juniorSE analyzes the actual beam system directly.
 
-The library must block unsupported paths rather than silently substitute a simpler equation.
+### Important analysis boundaries
+
+Second-order analysis is currently an **elastic geometric-stiffness analysis aid**. It is not represented as a complete AISC 360-16 Direct Analysis Method implementation.
+
+Torsion currently covers **Saint-Venant torsion only**. Restrained warping and associated warping stresses are not yet implemented.
+
+When support settlement is present, juniorSE does not automatically treat absolute displacement as the applicable code deflection. The result is flagged because serviceability may need to be measured relative to the displaced support chord.
+
+---
+
+## Current AISC 360-16 design scope
+
+The current steel design path uses AISC 360-16 and includes:
+
+### Chapter B — Design requirements / section classification
+
+- flexural-element classification for the currently supported doubly symmetric I-shaped/W-shape path
+- compact, noncompact, and slender classification logic used to route the member to the applicable Chapter F path
+
+### Chapter F — Flexure
+
+- **F2** — compact web / compact flange major-axis flexure
+- **F3** — compact web with noncompact or slender flange
+- **F4** — supported doubly symmetric I-shaped members with noncompact webs
+- **F5** — supported doubly symmetric I-shaped members with slender webs
+- yielding and lateral-torsional-buckling paths applicable to the implemented cases
+- compression-flange local-buckling behavior for the implemented cases
+- ASD/LRFD available strength and demand-capacity reporting
+
+### Chapter G — Shear
+
+- unstiffened-web shear
+- calculated `Cv1` for the implemented web-slenderness range
+- ASD/LRFD available shear strength and DCR
+
+### Chapter J10 — Web local checks
+
+- **J10.2** web local yielding
+- **J10.3** web local crippling
+
+Support/connection bearing design is intentionally not included at this stage.
+
+### Serviceability defaults
+
+Current default beam deflection criteria are:
+
+```text
+Live load deflection        ≤ L/240
+Dead + live load deflection ≤ L/360
+```
+
+These are explicit juniorSE defaults and should be overridden when project-specific criteria require something else.
+
+---
+
+## Demand-to-strength workflow
+
+The generalized analysis engine now feeds the existing AISC strength modules through a standardized demand envelope.
+
+For example:
+
+```text
+Actual beam + loading
+        ↓
+Beam analysis
+        ↓
+M+, M-, |M|max, Vmax, reactions, locations
+        ↓
+Chapter F flexure checks
+Chapter G shear check
+J10 local web checks where applicable
+        ↓
+Serviceability
+        ↓
+QA/QC
+        ↓
+Governing DCR + governing limit state + governing location
+```
+
+Positive and negative moments are preserved separately so continuous-beam behavior is not collapsed into one unsigned number.
+
+Moving-load envelopes can feed the same strength workflow.
+
+Torsional demand is reported separately and is **not** treated as fully covered by Chapters F, G, and J10.
+
+---
+
+## Verification and benchmark philosophy
+
+juniorSE should not be considered trustworthy because an equation "looks right."
+
+Every validated or executable skill should include tests that cover, where applicable:
+
+- valid inputs
+- missing critical inputs
+- blocked unsupported conditions
+- limit-state transitions
+- unit consistency
+- known-answer calculations
+- regression cases
+- independent benchmark problems
+
+Where official worked examples exist, they are preferred benchmark sources.
+
+For the current flexural implementation:
+
+- the F4 path includes a regression benchmark based on **AISC 15th Edition Manual Companion v15.1, Volume 1, Example F.15 — Plate Girder Flexural Member**
+- the Companion is keyed to ANSI/AISC 360-16
+- no dedicated F5 slender-web Chapter F example was identified in the Companion examples used during development, so F5 is tested against the AISC 360-16 equation path and is **not** labeled as Companion-benchmarked
+
+The distinction between an official worked-example benchmark and an equation-path test should remain explicit throughout the project.
+
+---
+
+## Guardrails and intentionally unsupported paths
+
+The current library should block rather than improvise when a requested task falls outside the implemented scope.
+
+Current notable limitations include:
+
+- singly symmetric F4/F5 implementation
+- composite beam design
+- restrained-warping torsion
+- torsional strength interaction
+- full axial tension strength
+- full axial compression strength
+- Chapter H axial + flexure interaction
+- biaxial beam-column strength interaction
+- connection design
+- bearing-plate design
+
+These are roadmap items, not capabilities that should be inferred from adjacent implemented skills.
+
+---
+
+## Example behavior
+
+A user should be able to give juniorSE a bounded task such as:
+
+> Check this W-shape beam for the given loading using AISC 360-16 LRFD.
+
+Before calculating, the applicable skills should determine whether enough information exists to proceed.
+
+If critical information is missing, juniorSE should respond with something like:
+
+```text
+I cannot complete this check until the following are known:
+- steel grade
+- member section
+- support condition
+- lateral bracing / unbraced length
+- load magnitudes and load status
+- design method
+```
+
+When sufficient information exists, the workflow should produce:
+
+1. task classification
+2. input summary
+3. assumptions
+4. code/design basis
+5. analysis results
+6. strength checks
+7. serviceability checks
+8. governing limit state and DCR
+9. QA/QC review
+10. engineer-review notes
+
+The objective is a result that a structural engineer can review—not an opaque answer that must be reconstructed from scratch.
+
+---
+
+## Roadmap
+
+The next major steel milestone is **full axial strength and Chapter H interaction**.
+
+Planned areas include:
+
+- Chapter D tension-member strength
+- Chapter E compression-member strength
+- Chapter H axial + flexure interaction
+- biaxial interaction
+- expanded torsional design behavior
+- additional steel-member and system skills
+- concrete design skills
+- wood / NDS design skills
+- broader loading, wind, seismic, diaphragm, drift, and lateral-system workflows
+- calculation-package generation and review
+- code-navigation and code-reasoning skills
+
+The long-term goal is not a single steel-beam calculator. It is a broad, reusable structural design and analysis skill library that AI agents can build on while remaining explicit about scope, assumptions, and engineer supervision.
+
+---
+
+## Contributing
+
+Contributions should improve engineering reliability, not merely add more output.
+
+When proposing a new validated or executable skill, include:
+
+- a clear trigger and scope
+- required inputs
+- explicit stop conditions
+- supported and unsupported paths
+- `SKILL.md`
+- `rules.yaml`
+- `validator.py`
+- `examples/`
+- `tests/`
+- `calculator.py` when the skill performs calculations
+- code references or benchmark basis where applicable
+
+New engineering paths should be benchmarked against reliable worked examples or independently verified calculations whenever possible.
+
+If a contribution cannot support a condition safely, the skill should block that condition rather than silently approximate it.
+
+---
 
 ## Engineering responsibility
-juniorSE is intended for engineer-supervised workflows. Results require review by a qualified structural engineer and are not a substitute for project-specific code interpretation, engineering judgment, or professional responsibility.
 
-## v1.0 — Phase 2 demand-to-strength integration
+juniorSE is intended for **engineer-supervised workflows**.
 
-The generalized `steel-beam-gravity-analysis` demand envelope now feeds the existing AISC 360-16 strength modules. `steel-beam-gravity-check` preserves positive and negative moment separately for Chapter F, sends governing shear to Chapter G, resolves explicitly requested support-reaction/local-force cases to J10.2/J10.3, and reports torsional demand separately rather than treating F/G/J10 as a torsional design check. The older simple-span UDL interface remains compatibility-only.
+Outputs require review by a qualified structural engineer and are not a substitute for:
+
+- project-specific code interpretation
+- engineering judgment
+- construction-document review
+- professional responsibility
+- responsible charge by the engineer of record
+
+The project is designed to make AI-assisted structural work more disciplined, transparent, testable, and reviewable—not autonomous.
