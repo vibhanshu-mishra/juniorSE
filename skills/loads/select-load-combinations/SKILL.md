@@ -2,151 +2,86 @@
 name: select-load-combinations
 category: structural-loads
 level: executable
-description: Select and evaluate bounded ASCE 7 style ASD/LRFD load combinations for scalar structural effects under engineer supervision.
+description: Edition-aware ASCE 7 Chapter 2 load-combination routing and scalar evaluation for engineer-supervised structural design.
 ---
 
 # select-load-combinations
 
-Use this skill to select and evaluate common structural load combinations in a controlled, code-aware way before member or system design.
-
-This skill does not replace the governing code. It forces the AI to identify the design method, load standard, load types, load status, and objective before selecting combinations. In v0.3, this skill includes a bounded `calculator.py` that evaluates common ASCE 7-16/ASCE 7-22 style ASD and LRFD scalar combinations for D, L, Lr, S, R, W, and E.
+Use this skill to select and evaluate ASCE 7 Chapter 2 load combinations in a controlled, edition-aware way.
 
 ## Trigger
 
-Use this skill when the user asks:
-
-- which load factor to use
-- whether ASD or LRFD applies
-- what load combination governs
-- how to combine dead, live, roof live, snow, rain, wind, or seismic effects
-- to convert service-level loads into candidate ASD/LRFD design demands
-- to evaluate positive/negative wind or seismic scalar effects
-
-## Do not use this skill for
-
-- final sealed design
-- special seismic load effects or overstrength combinations
-- flood, soil, self-straining, crane, construction, ponding, ice, or local amendment provisions
-- automatic load path determination
-- automatic live-load companion reduction eligibility
-- multi-axis envelope generation
-- serviceability limit checks beyond identifying that service-level combinations/criteria are needed
-
-If any of those are needed, stop and say this skill version does not support that scope yet.
-
-## Ground rules
-
-- Do not select combinations until the design method is known: ASD or LRFD.
-- Do not mix ASD and LRFD.
-- Do not factor loads that are already factored unless the user explicitly asks for a documented special case.
-- Do not treat service-level reactions from software as factored unless stated.
-- Do not ignore companion loads without explaining why they are excluded.
-- Do not invent wind/seismic direction or sign convention.
-- State the load standard and edition if known.
-- If the exact edition is unknown, label the result as blocked or preliminary and request confirmation.
-- Always disclose unsupported load types.
+Use when the user asks which load combination governs, which factors apply, whether ASD/LRFD is being used correctly, or how D/L/Lr/S/R/W/E/F/H and supported special Chapter 2 effects should be combined.
 
 ## Required inputs
 
-- `code_family`: currently only `ASCE 7` is supported
-- `code_edition`: currently `ASCE 7-16` and `ASCE 7-22` are explicitly supported as preliminary basis
+- `code_family`: `ASCE 7`
+- `code_edition`: `ASCE 7-16` or `ASCE 7-22`
 - `design_method`: `ASD` or `LRFD`
 - `load_level`: `service` or `factored`
-- `loads`: numeric scalar load effects using supported keys: `D`, `L`, `Lr`, `S`, `R`, `W`, `E`
-- `objective`: strength, allowable stress, uplift, overturning, drift/serviceability context, etc.
+- `loads`: scalar target effects
+- `objective`: strength / allowable stress / uplift / overturning / serviceability context
 
-## Stop conditions
+Additional inputs are required when applicable:
 
-Stop and ask if:
+- `h_effect`: `adds` or `resists`
+- `h_is_permanent`: required when H resists
+- `seismic_effect_definition`: required for legacy scalar `E` under ASCE 7-22
+- `chapter2_family`: basic, flood, ice, self_straining, nonspecified, seismic, extraordinary, structural_integrity, or water_in_soil
+- `resolved_special_combinations`: required for special families not yet separately benchmarked numerically
 
-- ASD/LRFD method is unknown
-- load status is unknown: service-level vs factored
-- load magnitudes are missing or nonnumeric
-- load types are unclear
-- unsupported load cases are present
-- wind/seismic directionality or sign matters and is not defined
-- the user asks for governing combination but gives only a final software envelope with no combination basis
-- code edition/local amendments materially affect the answer
+## Edition behavior
+
+### ASCE 7-16
+
+- Executes basic LRFD/ASD combinations using the ASCE 7-16 Chapter 2 basis.
+- Supports the legacy resolved scalar seismic effect `E` in the ASCE 7-16 combination path.
+- Does not permit ASCE 7-22-only `WT` or water-in-soil family routing.
+
+### ASCE 7-22
+
+- Executes the revised basic strength/ASD combinations.
+- Supports wind or tornado effect `WT` as an edition-specific wind family.
+- Handles `F` with the same factor as `D` in applicable basic combinations.
+- Requires explicit H directionality and permanence where relevant.
+- Routes resolved seismic effects through Sections 2.3.6 / 2.4.5 using `Ev` plus `Eh` or `Emh`.
+- Recognizes the Section 2.3.7 water-in-soil family.
 
 ## Process
 
-1. Identify the design objective: strength, allowable stress, serviceability, drift, overturning, uplift, or stability.
-2. Confirm design method: ASD or LRFD.
-3. Confirm load standard and code edition.
-4. List all load types present.
-5. Confirm all load magnitudes and whether they are service-level or factored.
-6. Run `validator.py`.
-7. If validation is blocked, return the missing/unsupported items and do not calculate.
-8. If loads are already factored, block automatic refactoring.
-9. Run `calculator.py` only for supported service-level D, L, Lr, S, R, W, and E scalar effects.
-10. Generate relevant candidate combinations.
-11. Evaluate positive and negative wind/seismic direction variants where applicable.
-12. Identify governing positive, governing negative, and governing absolute scalar effect.
-13. State exclusions, limitations, and engineer review notes.
-
-## Output format
-
-```text
-Design method: [ASD/LRFD]
-Load standard: [ASCE 7 edition or preliminary basis]
-Load status: [service/factored/unknown]
-Load types considered: [list]
-Objective: [strength/serviceability/uplift/etc.]
-
-Validation:
-[ready/blocked with missing inputs, unsupported loads, warnings]
-
-Candidate combinations:
-1. [name]: [expression] = [value]
-2. [name]: [expression] = [value]
-
-Governing scalar effects:
-- Governing positive: [combo] = [value]
-- Governing negative: [combo] = [value]
-- Governing absolute: [combo] = [value]
-
-Not checked / requires confirmation:
-- [item]
-
-Engineer review note:
-This is a preliminary juniorSE output and must be reviewed against the governing code, project criteria, sign conventions, and local amendments.
-```
+1. Identify code edition and ASD/LRFD basis.
+2. Confirm loads are service-level before applying factors.
+3. Identify the Chapter 2 family.
+4. Validate edition-specific load symbols and required applicability inputs.
+5. If H is present, determine whether it adds to or resists the principal effect and whether it is permanent.
+6. If seismic is present, confirm whether the input is a resolved legacy `E` or resolved `Ev`/`Eh`/`Emh` effects.
+7. Generate only applicable candidate combinations.
+8. Evaluate directional variants for wind/tornado/seismic scalar effects.
+9. Report governing positive, negative, and absolute scalar effects.
+10. Route serviceability to service-load criteria rather than applying strength factors.
+11. For flood, ice, self-straining, nonspecified, extraordinary, structural-integrity, and water-in-soil families, block unless the needed code-defined combination data are explicitly resolved and supplied.
 
 ## Guardrails
 
-- If loads are already factored, do not apply factors again.
-- If checking serviceability, use service-level combinations/criteria rather than strength factors unless the task explicitly requires otherwise.
-- If wind or seismic creates positive and negative effects, evaluate both signs for scalar effects and ask the engineer to confirm sign convention.
-- If both ASD and LRFD results are requested, keep them in separate sections.
-- Do not claim that this skill handles special seismic combinations, overstrength, local amendments, or unsupported load cases.
-- Do not claim a final governing result if unsupported loads are present.
+- Never refactor already factored loads silently.
+- Never assume H directionality or permanence.
+- Never treat ASCE 7-16 and ASCE 7-22 factors as interchangeable.
+- Never silently collapse ASCE 7-22 `Ev` and `Eh` into a vague scalar seismic effect.
+- Never invent flood, ice, self-straining, extraordinary-event, structural-integrity, or water-in-soil factors.
+- Serviceability is not a strength-combination problem.
+- Wind/tornado and seismic effects are not assumed to act simultaneously unless the governing provision explicitly requires it.
+
+## Machine-readable rules
+
+Edition-specific metadata is stored in:
+
+```text
+rules/asce7_16.yaml
+rules/asce7_22.yaml
+```
+
+The Python evaluator reads the selected ruleset and exposes it in the output for QA/QC.
 
 ## Definition of done
 
-The skill is complete when:
-
-- inputs are summarized
-- method is clear
-- load status is clear
-- unsupported loads are disclosed
-- candidate combinations are shown or blocked with reasons
-- governing positive/negative/absolute scalar effects are identified when applicable
-- excluded provisions are stated
-- downstream design skill can use the selected demand without ambiguity
-- engineer review is explicitly required
-
-## Handoffs
-
-- Use `assumption-guardrails` before selecting combinations if inputs are incomplete.
-- Use material/member design skills after determining demand.
-- Use `calculation-qaqc-review` before final output if numerical demand is calculated.
-
-## Implementation files
-
-This juniorSE skill includes machine-checkable support files:
-
-- `rules.yaml` for required inputs, supported load cases, stop conditions, guardrails, calculator scope, and definition of done.
-- `validator.py` for input validation and stop-condition checks.
-- `calculator.py` for bounded scalar ASD/LRFD candidate combination evaluation.
-- `examples/` for passing and blocked scenarios.
-- `tests/` for automated validation and calculator behavior.
+The result is complete when the edition, method, load level, Chapter 2 family, applicable candidate combinations, governing scalar effects, exclusions, and engineer-review notes are explicit.

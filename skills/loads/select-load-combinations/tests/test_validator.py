@@ -61,7 +61,7 @@ def test_lrfd_gravity_combinations_return_governing_value():
         "objective": "strength",
     })
     assert result["status"] == "complete_preliminary"
-    assert result["governing_positive"]["name"] == "LRFD-2"
+    assert result["governing_positive"]["name"] == "LRFD-722-2a-none"
     assert abs(result["governing_positive"]["value"] - 4.4) < 1e-9
     assert len(result["candidate_combinations"]) >= 2
 
@@ -76,7 +76,7 @@ def test_asd_gravity_combinations_return_service_level_governing_value():
         "objective": "allowable_stress",
     })
     assert result["status"] == "complete_preliminary"
-    assert result["governing_positive"]["name"] == "ASD-2"
+    assert result["governing_positive"]["name"] == "ASD-722-2a"
     assert abs(result["governing_positive"]["value"] - 3.0) < 1e-9
 
 
@@ -90,13 +90,13 @@ def test_wind_combinations_evaluate_positive_and_negative_lateral_direction():
         "objective": "uplift_or_overturning",
     })
     names = {combo["name"] for combo in result["candidate_combinations"]}
-    assert "LRFD-6-W+" in names
-    assert "LRFD-6-W-" in names
+    assert "LRFD-722-5a-W+" in names
+    assert "LRFD-722-5a-W-" in names
     assert result["governing_positive"]["value"] == 6.2
     assert result["governing_negative"]["value"] == -4.1
 
 
-def test_blocks_unsupported_load_case_until_skill_supports_it():
+def test_h_load_is_recognized_but_blocks_until_directionality_is_given():
     result = validator.validate({
         "code_family": "ASCE 7",
         "code_edition": "ASCE 7-22",
@@ -106,4 +106,5 @@ def test_blocks_unsupported_load_case_until_skill_supports_it():
         "objective": "strength",
     })
     assert result["status"] == "blocked"
-    assert "H" in result["unsupported_load_cases"]
+    assert "H" not in result["unsupported_load_cases"]
+    assert "h_effect" in result["missing_inputs"]

@@ -1,79 +1,35 @@
 skill_id: select-load-combinations
 level: executable
-purpose: Select and evaluate bounded ASCE 7 style ASD/LRFD load combinations while preventing ASD/LRFD and service/factored load mixing.
-required_inputs:
-  - code_family
-  - code_edition
-  - design_method
-  - load_level
-  - loads
-  - objective
-allowed_code_families:
-  - ASCE 7
-allowed_code_editions:
-  - ASCE 7-16
-  - ASCE 7-22
-allowed_design_methods:
-  - ASD
-  - LRFD
-allowed_load_levels:
-  - service
-  - factored
-supported_load_cases:
-  - D
-  - L
-  - Lr
-  - S
-  - R
-  - W
-  - E
-unsupported_in_v0_3:
-  - H
-  - F
-  - T
-  - Fa
+purpose: Edition-aware ASCE 7 Chapter 2 load-combination routing and scalar evaluation with explicit guardrails.
+required_inputs: [code_family, code_edition, design_method, load_level, loads, objective]
+allowed_code_families: ['ASCE 7']
+allowed_code_editions: ['ASCE 7-16','ASCE 7-22']
+allowed_design_methods: ['ASD','LRFD']
+allowed_load_levels: ['service','factored']
+recognized_load_cases:
+  basic: [D,L,Lr,S,R,W,E,F,H]
+  asce7_22: [WT,Ev,Eh,Emh,Hw]
+  special: [Fa,Di,Wi,T,N,Ak,Ni]
+chapter2_families:
+  - basic
+  - flood
   - ice
-  - crane
-  - ponding
-  - construction
-  - load-duration or material-specific resistance modifiers
+  - self_straining
+  - nonspecified
+  - seismic
+  - extraordinary
+  - structural_integrity
+  - water_in_soil
 stop_conditions:
-  - field: code_family
-    message: Cannot select load combinations without governing load code family, such as ASCE 7.
-  - field: code_edition
-    message: Cannot claim code-specific combinations without code edition.
-  - field: design_method
-    message: Cannot select demand/capacity format without ASD or LRFD.
-  - field: load_level
-    message: Cannot proceed until loads are identified as service-level or factored.
-  - field: loads
-    message: Cannot evaluate combinations without numeric load magnitudes.
-  - field: objective
-    message: Cannot identify governing demand without objective/effect being checked.
-  - field: unsupported_load_case
-    message: Unsupported load cases must be handled outside this skill version or added intentionally with tests.
-forbidden:
-  - Do not mix ASD combinations with LRFD capacities.
-  - Do not mix LRFD combinations with ASD allowable capacities.
-  - Do not use already-factored loads in another factored combination unless explicitly directed and justified.
-  - Do not claim final governing design if sign convention, directionality, code edition, or local amendments could change the result.
-calculator_scope:
-  implemented:
-    - scalar evaluation of common ASCE 7-16/7-22 style ASD and LRFD combinations for D, L, Lr, S, R, W, and E
-    - positive and negative wind/seismic direction variants
-    - positive, negative, and absolute governing scalar effects
-  not_implemented:
-    - special seismic load effects and overstrength combinations
-    - flood, soil, self-straining, crane, ice, ponding, construction, or local amendment provisions
-    - automatic live-load companion reduction eligibility
-    - multi-axis envelope logic
-    - serviceability-specific code limits
+  - No silent assumption of H directionality or permanence.
+  - ASCE 7-22 scalar E must be identified as a resolved legacy seismic effect or decomposed into Ev/Eh.
+  - Special Chapter 2 families require resolved_special_combinations until their exact numerical rules are separately benchmarked.
+  - Serviceability objectives route outside Chapter 2 strength/ASD combination generation.
+  - Already factored loads are not re-factored.
 definition_of_done:
-  - Inputs summarized.
-  - Design method stated.
-  - Load level stated.
-  - Applicable combination family stated.
-  - Candidate combinations evaluated or blocked with reasons.
-  - Governing positive/negative/absolute scalar effect reported when applicable.
-  - Missing or excluded load types disclosed.
-  - Limitations and engineer review note included.
+  - Edition-specific ruleset identified.
+  - Applicable Chapter 2 family identified.
+  - Candidate combinations evaluated or safely routed/blocked.
+  - Direction/sign variants evaluated where applicable.
+  - Governing positive, negative, and absolute scalar effects reported.
+  - Limitations and engineer-review notes reported.

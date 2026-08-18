@@ -1,0 +1,9 @@
+{
+  "code_family": "ASCE 7",
+  "code_edition": "ASCE 7-22",
+  "design_method": "LRFD",
+  "load_level": "service",
+  "loads": {"D": 100, "Fa": 50},
+  "chapter2_family": "flood",
+  "objective": "strength"
+}
