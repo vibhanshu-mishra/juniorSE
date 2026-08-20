@@ -20,6 +20,68 @@ It is **not** intended to replace a structural engineer, professional judgment, 
 
 ---
 
+## Install juniorSE in Claude Code
+
+juniorSE can be used as a Claude Code plugin so users do not need to copy individual skills manually. The repository includes a Claude plugin manifest, marketplace definition, and a top-level `juniorse` router skill.
+
+### Install from GitHub
+
+After this repository version is pushed to GitHub, add the juniorSE marketplace and install the plugin:
+
+```bash
+claude plugin marketplace add vibhanshu-mishra/juniorSE
+claude plugin install juniorse@juniorse
+```
+
+Restart Claude Code or run `/reload-plugins` if prompted. juniorSE skills are namespaced under the plugin. You can invoke the top-level router explicitly with:
+
+```text
+/juniorse:juniorse
+```
+
+or ask a structural-engineering question normally and allow Claude to select an applicable juniorSE skill from its descriptions.
+
+### Test the plugin from a local checkout
+
+From the repository root:
+
+```bash
+claude --plugin-dir .
+```
+
+Then invoke:
+
+```text
+/juniorse:juniorse
+```
+
+For repository-level development, `CLAUDE.md` supplies project instructions. Installed plugins do not rely on that file; the runtime structural-engineering operating rules live in the `juniorse` router skill itself.
+
+### Other agents
+
+The individual `SKILL.md` files remain plain-text Agent Skills and can be consumed by other compatible agents. `AGENTS.md` documents cross-agent contribution rules; the Python validators and calculators can also be used independently of Claude.
+
+## Agent-facing architecture
+
+```text
+CLAUDE.md                         # repo-development instructions
+AGENTS.md                         # cross-agent contributor rules
+.claude-plugin/
+├── plugin.json                   # Claude plugin manifest
+└── marketplace.json              # installable GitHub marketplace entry
+plugin-skills/
+└── juniorse/
+    └── SKILL.md                  # top-level runtime router
+skills/
+├── core/                         # assumptions, response protocol, QA/QC
+├── loads/                        # ASCE 7 load-combination skills
+└── steel/                        # analysis and steel design skills
+```
+
+The router does not contain duplicate engineering equations. It classifies the task and routes Claude into the narrowest existing skill, preserving that skill's validator, calculator, tests, and stop conditions.
+
+---
+
 ## Why juniorSE exists
 
 Large language models can do arithmetic, explain structural concepts, and often reproduce familiar engineering equations. That does not make them reliable structural engineers.
