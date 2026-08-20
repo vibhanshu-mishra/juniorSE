@@ -26,7 +26,7 @@ juniorSE can be used as a Claude Code plugin so users do not need to copy indivi
 
 ### Install from GitHub
 
-After this repository version is pushed to GitHub, add the juniorSE marketplace and install the plugin:
+Add the juniorSE marketplace and install the plugin:
 
 ```bash
 claude plugin marketplace add vibhanshu-mishra/juniorSE
@@ -60,23 +60,6 @@ For repository-level development, `CLAUDE.md` supplies project instructions. Ins
 ### Other agents
 
 The individual `SKILL.md` files remain plain-text Agent Skills and can be consumed by other compatible agents. `AGENTS.md` documents cross-agent contribution rules; the Python validators and calculators can also be used independently of Claude.
-
-## Agent-facing architecture
-
-```text
-CLAUDE.md                         # repo-development instructions
-AGENTS.md                         # cross-agent contributor rules
-.claude-plugin/
-├── plugin.json                   # Claude plugin manifest
-└── marketplace.json              # installable GitHub marketplace entry
-plugin-skills/
-└── juniorse/
-    └── SKILL.md                  # top-level runtime router
-skills/
-├── core/                         # assumptions, response protocol, QA/QC
-├── loads/                        # ASCE 7 load-combination skills
-└── steel/                        # analysis and steel design skills
-```
 
 The router does not contain duplicate engineering equations. It classifies the task and routes Claude into the narrowest existing skill, preserving that skill's validator, calculator, tests, and stop conditions.
 
@@ -174,7 +157,6 @@ calculator.py
 The intent is that **Markdown teaches the method, rules constrain the method, Python executes or validates it, and tests prove expected behavior.**
 
 ---
-
 
 ## ASCE 7 Chapter 2 load combinations
 
@@ -300,7 +282,7 @@ When support settlement is present, juniorSE does not automatically treat absolu
 
 The current steel design path uses AISC 360-16 and includes:
 
-### Chapter B — Design requirements / section classification
+### Chapter B — Design requirements/section classification
 
 - flexural-element classification for the currently supported doubly symmetric I-shaped/W-shape path
 - compact, noncompact, and slender classification logic used to route the member to the applicable Chapter F path
