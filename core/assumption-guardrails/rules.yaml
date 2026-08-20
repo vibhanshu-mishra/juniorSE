@@ -1,0 +1,29 @@
+skill_id: core.assumption_guardrails
+maturity_level: framework_validated
+critical_assumption_fields:
+  - code_edition
+  - jurisdiction
+  - material_grade
+  - design_method
+  - load_level
+  - support_condition
+  - bracing_condition
+  - boundary_condition
+  - load_path
+  - risk_category
+  - exposure_category
+  - site_class
+forbidden_silent_assumptions:
+  - material_grade
+  - bracing_condition
+  - design_method
+  - load_level
+  - code_edition
+  - support_condition
+allowed_assumption_statuses:
+  - user_provided
+  - explicitly_assumed_preliminary
+  - not_required_for_scope
+blocked_if:
+  - critical_assumption_missing_and_required
+  - forbidden_silent_assumption_used

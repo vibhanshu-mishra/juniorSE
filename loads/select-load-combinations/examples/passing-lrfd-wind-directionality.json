@@ -1,0 +1,17 @@
+{
+  "input": {
+    "code_family": "ASCE 7",
+    "code_edition": "ASCE 7-22",
+    "design_method": "LRFD",
+    "load_level": "service",
+    "loads": {"D": 1.0, "W": 5.0},
+    "objective": "uplift_or_overturning"
+  },
+  "expected_behavior": {
+    "status": "complete_preliminary",
+    "includes": ["LRFD-6-W+", "LRFD-6-W-"],
+    "governing_positive_value": 6.2,
+    "governing_negative_value": -4.1,
+    "engineer_review_required": true
+  }
+}

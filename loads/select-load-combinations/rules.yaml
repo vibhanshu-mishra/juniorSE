@@ -1,0 +1,35 @@
+skill_id: select-load-combinations
+level: executable
+purpose: Edition-aware ASCE 7 Chapter 2 load-combination routing and scalar evaluation with explicit guardrails.
+required_inputs: [code_family, code_edition, design_method, load_level, loads, objective]
+allowed_code_families: ['ASCE 7']
+allowed_code_editions: ['ASCE 7-16','ASCE 7-22']
+allowed_design_methods: ['ASD','LRFD']
+allowed_load_levels: ['service','factored']
+recognized_load_cases:
+  basic: [D,L,Lr,S,R,W,E,F,H]
+  asce7_22: [WT,Ev,Eh,Emh,Hw]
+  special: [Fa,Di,Wi,T,N,Ak,Ni]
+chapter2_families:
+  - basic
+  - flood
+  - ice
+  - self_straining
+  - nonspecified
+  - seismic
+  - extraordinary
+  - structural_integrity
+  - water_in_soil
+stop_conditions:
+  - No silent assumption of H directionality or permanence.
+  - ASCE 7-22 scalar E must be identified as a resolved legacy seismic effect or decomposed into Ev/Eh.
+  - Special Chapter 2 families require resolved_special_combinations until their exact numerical rules are separately benchmarked.
+  - Serviceability objectives route outside Chapter 2 strength/ASD combination generation.
+  - Already factored loads are not re-factored.
+definition_of_done:
+  - Edition-specific ruleset identified.
+  - Applicable Chapter 2 family identified.
+  - Candidate combinations evaluated or safely routed/blocked.
+  - Direction/sign variants evaluated where applicable.
+  - Governing positive, negative, and absolute scalar effects reported.
+  - Limitations and engineer-review notes reported.
