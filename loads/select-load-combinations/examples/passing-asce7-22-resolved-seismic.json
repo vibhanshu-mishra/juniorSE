@@ -1,8 +1,0 @@
-{
-  "code_family": "ASCE 7",
-  "code_edition": "ASCE 7-22",
-  "design_method": "LRFD",
-  "load_level": "service",
-  "loads": {"D": 100, "L": 40, "S": 20, "Ev": 8, "Eh": 35},
-  "objective": "strength"
-}
